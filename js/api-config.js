@@ -27,6 +27,14 @@ const API_CONFIG = {
     OPEN_LIBRARY: {
         BASE_URL: 'https://openlibrary.org',
         COVERS_URL: 'https://covers.openlibrary.org/b'
+    },
+
+    // Google Books API - Books Database
+    // No API key required for basic searches
+    GOOGLE_BOOKS: {
+        BASE_URL: 'https://www.googleapis.com/books/v1',
+        THUMBNAIL_SIZE: 'thumbnail', // Options: thumbnail, smallThumbnail, medium, large
+        MAX_RESULTS: 40 // Maximum results per request (API limit is 40)
     }
 };
 

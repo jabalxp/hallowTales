@@ -56,6 +56,26 @@ async function fetchHorrorGames() {
                 sinopse = sinopse.substring(0, 247) + '...';
             }
 
+            // Map RAWG genres to our categories
+            let categoria = 'Horror';
+            const genreNames = game.genres?.map(g => g.name.toLowerCase()) || [];
+            const tagNames = game.tags?.map(t => t.name.toLowerCase()) || [];
+            
+            // Check tags and genres for category mapping
+            if (tagNames.includes('survival horror') || tagNames.includes('survival')) {
+                categoria = 'Survival Horror';
+            } else if (tagNames.includes('psychological horror') || tagNames.includes('psychological')) {
+                categoria = 'Psychological Horror';
+            } else if (tagNames.includes('co-op') || tagNames.includes('multiplayer') || tagNames.includes('online co-op')) {
+                categoria = 'Co-op Horror';
+            } else if (genreNames.includes('indie')) {
+                categoria = 'Indie Horror';
+            } else if (genreNames.includes('action')) {
+                categoria = 'Action Horror';
+            } else if (genreNames.includes('adventure')) {
+                categoria = 'Adventure Horror';
+            }
+
             return {
                 id: game.slug || `jogo-${index + 1}`,
                 titulo: game.name,
@@ -64,7 +84,7 @@ async function fetchHorrorGames() {
                 sinopse: sinopse,
                 poster: game.background_image || 'https://via.placeholder.com/500x750/1a0033/00ff00?text=No+Image',
                 plataformas: game.parent_platforms?.map(p => p.platform.name).join(', ') || 'PC',
-                categoria: game.genres?.map(g => g.name).join(', ') || 'Horror',
+                categoria: categoria,
                 nota: game.rating ? parseFloat(game.rating.toFixed(1)) : (game.metacritic ? game.metacritic / 10 : 7.5),
                 metacritic: game.metacritic || null,
                 rawg_id: game.id,

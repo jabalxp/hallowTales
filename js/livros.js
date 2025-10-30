@@ -1,65 +1,270 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const livros = [
-        { titulo: "O Iluminado", autor: "Stephen King", resumo: "Jack Torrance, um aspirante a escritor e alcoólatra em recuperação, aceita um emprego como zelador de inverno no isolado Hotel Overlook, nas montanhas do Colorado. Ele se muda com sua esposa, Wendy, e seu filho, Danny, que possui 'o brilho', uma habilidade psíquica. O hotel, assombrado por eventos passados, exerce uma influência malévola sobre Jack, levando-o à loucura e violência." },
-        { titulo: "Drácula", autor: "Bram Stoker", resumo: "O romance narra a história do Conde Drácula, um vampiro da Transilvânia que se muda para a Inglaterra em busca de sangue novo e para espalhar sua maldição. Um pequeno grupo, liderado pelo Professor Abraham Van Helsing, luta para detê-lo." },
-        { titulo: "Frankenstein", autor: "Mary Shelley", resumo: "Victor Frankenstein, um jovem cientista, cria uma criatura grotesca em um experimento científico pouco ortodoxo. Horrorizado com sua criação, Victor a abandona. A criatura, rejeitada pela sociedade, busca vingança contra seu criador." },
-        { titulo: "O Exorcista", autor: "William Peter Blatty", resumo: "Regan MacNeil, uma menina de 12 anos, é possuída por uma entidade demoníaca. Sua mãe, desesperada, busca a ajuda de dois padres para realizar um exorcismo e salvar sua filha." },
-        { titulo: "A Assombração da Casa da Colina", autor: "Shirley Jackson", resumo: "Dr. Montague, um investigador do sobrenatural, aluga a Casa da Colina, uma mansão com fama de assombrada, para um estudo. Ele convida três pessoas, incluindo a tímida Eleanor Vance, que desenvolve uma estranha conexão com a casa." },
-        { titulo: "Psicose", autor: "Robert Bloch", resumo: "Marion Crane, uma secretária, rouba 40 mil dólares e foge. Durante sua fuga, ela para no Motel Bates, administrado pelo recluso e estranho Norman Bates e sua mãe dominadora. O que acontece a seguir é um dos maiores choques da literatura de suspense." },
-        { titulo: "O Chamado de Cthulhu", autor: "H.P. Lovecraft", resumo: "Uma coleção de contos que introduz o panteão de entidades cósmicas conhecidas como os Grandes Antigos. A história principal segue a investigação de um culto que adora a entidade Cthulhu, que dorme em sua cidade submersa de R'lyeh, esperando para despertar e dominar o mundo." },
-        { titulo: "O Bebê de Rosemary", autor: "Ira Levin", resumo: "Rosemary Woodhouse e seu marido, Guy, se mudam para um apartamento em Nova York com uma reputação sinistra. Após Rosemary engravidar, ela começa a suspeitar que seus vizinhos idosos e seu próprio marido têm planos malignos para seu bebê." },
-        { titulo: "Eu Sou a Lenda", autor: "Richard Matheson", resumo: "Robert Neville é o último homem vivo na Terra... ou assim ele pensa. O resto da humanidade foi transformado em vampiros sedentos de sangue, e Neville deve lutar para sobreviver todas as noites enquanto busca uma cura durante o dia." },
-        { titulo: "It: A Coisa", autor: "Stephen King", resumo: "Em Derry, uma pequena cidade no Maine, sete crianças conhecidas como 'O Clube dos Perdedores' enfrentam uma criatura antiga que ressurge a cada 27 anos para se alimentar do medo das crianças, assumindo a forma de seus piores pesadelos, mais comumente o palhaço Pennywise." }
-    ];
-
-    const listaLivros = document.getElementById('lista-livros');
+document.addEventListener('DOMContentLoaded', async function() {
+    // Initialize favorites system
+    FavoritesManager.init();
+    
+    // Initialize books from API
+    await initializeBooks();
+    
+    // Get DOM elements
+    const listaRecomendados = document.getElementById('lista-recomendados');
+    const listaTodosLivros = document.getElementById('lista-todos-livros');
     const searchInput = document.getElementById('search-livros');
+    const loadingIndicator = document.getElementById('loading-books');
+    
+    // Filter buttons
+    const btnRecomendacao = document.getElementById('btn-recomendacao');
+    const btnPesquisa = document.getElementById('btn-pesquisa');
+    const secaoRecomendados = document.getElementById('livros-recomendados');
+    const secaoPesquisa = document.getElementById('todos-livros-section');
 
-    function exibirLivros(livrosFiltrados) {
-        listaLivros.innerHTML = '';
+    // Helper function to normalize text for comparison
+    function normalizeText(text) {
+        return text.toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^\w\s]/g, "")
+            .trim();
+    }
+
+    // Check if a book from API matches a recommended book
+    function findRecommendedBook(apiBook) {
+        const normalizedApiTitle = normalizeText(apiBook.titulo);
+        const normalizedApiOriginal = apiBook.tituloOriginal ? normalizeText(apiBook.tituloOriginal) : '';
         
-        if (livrosFiltrados.length === 0) {
-            listaLivros.innerHTML = '<p style="text-align: center; color: #ff4444; font-size: 1.2rem;">Nenhum livro encontrado. Tente outra busca.</p>';
+        return livrosData.recomendados.find(rec => {
+            const normalizedRecTitle = normalizeText(rec.titulo);
+            
+            // Exact match
+            if (normalizedRecTitle === normalizedApiTitle || normalizedRecTitle === normalizedApiOriginal) {
+                return true;
+            }
+            
+            // For very short titles (like "It"), require exact match or match with author
+            const recWords = normalizedRecTitle.split(/\s+/);
+            const apiWords = normalizedApiTitle.split(/\s+/);
+            if (recWords.length <= 2 || apiWords.length <= 2) {
+                // Check if author also matches for short titles
+                const normalizedRecAutor = normalizeText(rec.autor);
+                const normalizedApiAutor = normalizeText(apiBook.autor);
+                return (normalizedRecTitle === normalizedApiTitle || normalizedRecTitle === normalizedApiOriginal) &&
+                       (normalizedRecAutor.includes(normalizedApiAutor) || normalizedApiAutor.includes(normalizedRecAutor));
+            }
+            
+            // For longer titles, allow partial matching
+            return normalizedApiTitle.includes(normalizedRecTitle) ||
+                   normalizedRecTitle.includes(normalizedApiTitle) ||
+                   (normalizedApiOriginal && (normalizedApiOriginal.includes(normalizedRecTitle) || normalizedRecTitle.includes(normalizedApiOriginal)));
+        });
+    }
+
+    // Display recommended books
+    function exibirRecomendados() {
+        listaRecomendados.innerHTML = '';
+        
+        livrosData.recomendados.forEach((livro, index) => {
+            // Use API covers for specific books that should match with search results
+            const shouldUseApiCover = ['frankenstein', 'dracula'].includes(livro.id.toLowerCase());
+            const needsCover = !livro.capa || livro.capa.includes('placeholder') || shouldUseApiCover;
+            
+            if (needsCover) {
+                // Look for API match to get the cover
+                const apiMatch = livrosData.todos.find(apiBook => {
+                    const normalizedApiTitle = normalizeText(apiBook.titulo);
+                    const normalizedRecTitle = normalizeText(livro.titulo);
+                    const normalizedApiOriginal = apiBook.tituloOriginal ? normalizeText(apiBook.tituloOriginal) : '';
+                    const normalizedRecAutor = normalizeText(livro.autor);
+                    const normalizedApiAutor = normalizeText(apiBook.autor);
+                    
+                    // Exact match
+                    if (normalizedRecTitle === normalizedApiTitle || normalizedRecTitle === normalizedApiOriginal) {
+                        return true;
+                    }
+                    
+                    // For short titles, require author match too
+                    const recWords = normalizedRecTitle.split(/\s+/);
+                    const apiWords = normalizedApiTitle.split(/\s+/);
+                    if (recWords.length <= 2 || apiWords.length <= 2) {
+                        return (normalizedRecTitle === normalizedApiTitle || normalizedRecTitle === normalizedApiOriginal) &&
+                               (normalizedRecAutor.includes(normalizedApiAutor) || normalizedApiAutor.includes(normalizedRecAutor));
+                    }
+                    
+                    // For longer titles, allow partial matching
+                    return normalizedApiTitle.includes(normalizedRecTitle) ||
+                           normalizedRecTitle.includes(normalizedApiTitle) ||
+                           (normalizedApiOriginal && (normalizedApiOriginal.includes(normalizedRecTitle) || normalizedRecTitle.includes(normalizedApiOriginal)));
+                });
+                
+                // If found in API, use the API book's cover
+                if (apiMatch && apiMatch.capa) {
+                    livro.capa = apiMatch.capa;
+                }
+            }
+            
+            const div = createBookCard(livro, index, 'recomendado', false);
+            listaRecomendados.appendChild(div);
+        });
+        
+        // Initialize favorite buttons
+        FavoritesManager.initializeFavoriteButtons();
+    }
+
+    // Display all books
+    function exibirTodosLivros(livrosFiltrados = null) {
+        const livros = livrosFiltrados || livrosData.todos;
+        listaTodosLivros.innerHTML = '';
+        
+        if (livros.length === 0) {
+            listaTodosLivros.innerHTML = '<p style="text-align: center; color: #ff4444; font-size: 1.2rem;">Nenhum livro encontrado. Tente outra busca.</p>';
             return;
         }
         
-        livrosFiltrados.forEach((livro, index) => {
-            const div = document.createElement('div');
-            div.className = 'livro';
-            div.style.animationDelay = `${index * 0.1}s`;
-            div.innerHTML = `
-                <div class="livro-numero">#${index + 1}</div>
-                <h3>${livro.titulo}</h3>
-                <p><strong>Autor:</strong> ${livro.autor}</p>
-                <p>${livro.resumo}</p>
-            `;
-            listaLivros.appendChild(div);
+        livros.forEach((livro, index) => {
+            // Check if this API book is also a recommended book
+            const recommendedMatch = findRecommendedBook(livro);
+            const isRecommended = !!recommendedMatch;
+            
+            const div = createBookCard(livro, index, 'api', isRecommended);
+            listaTodosLivros.appendChild(div);
         });
         
-        // Atualizar contador
-        atualizarContador(livrosFiltrados.length);
+        // Update counter
+        atualizarContador(livros.length);
+        
+        // Initialize favorite buttons
+        FavoritesManager.initializeFavoriteButtons();
+    }
+
+    // Create book card with cover and favorite button
+    function createBookCard(livro, index, tipo, isRecommendedInSearch = false) {
+        const div = document.createElement('div');
+        div.className = 'livro-card';
+        div.style.animationDelay = `${index * 0.05}s`;
+        
+        const isFavorite = FavoritesManager.isFavorite('livros', livro.id);
+        const favoriteIcon = isFavorite ? '❤️' : '🤍';
+        const favoriteClass = isFavorite ? 'favorited' : '';
+        
+        // Build rating stars if available
+        let ratingHtml = '';
+        if (livro.nota) {
+            const stars = '⭐'.repeat(Math.round(livro.nota));
+            ratingHtml = `<p class="livro-rating">${stars} ${livro.nota}/10</p>`;
+        }
+        
+        // Determine badge to show
+        let badgeHtml = '';
+        if (tipo === 'recomendado') {
+            badgeHtml = '<div class="recomendado-badge">⭐ Recomendado</div>';
+        } else if (isRecommendedInSearch) {
+            badgeHtml = '<div class="recomendado-badge">⭐ Recomendado</div>';
+        }
+        
+        div.innerHTML = `
+            <div class="livro-capa-container">
+                <img src="${livro.capa}" alt="${livro.titulo}" class="livro-capa" loading="lazy">
+                <button class="favorite-btn ${favoriteClass}" 
+                        data-favorite-type="livros" 
+                        data-favorite-id="${livro.id}"
+                        data-favorite-data='${JSON.stringify({
+                            titulo: livro.titulo,
+                            autor: livro.autor,
+                            capa: livro.capa,
+                            ano: livro.ano
+                        })}'
+                        title="${isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
+                    ${favoriteIcon}
+                </button>
+                ${badgeHtml}
+            </div>
+            <div class="livro-info">
+                <h3 class="livro-titulo">${livro.titulo}</h3>
+                <p class="livro-autor"><strong>📖 Autor:</strong> ${livro.autor}</p>
+                ${livro.ano ? `<p class="livro-ano"><strong>📅 Ano:</strong> ${livro.ano}</p>` : ''}
+                ${livro.editora ? `<p class="livro-editora"><strong>🏢 Editora:</strong> ${livro.editora}</p>` : ''}
+                ${livro.categoria ? `<p class="livro-categoria"><strong>🏷️ Categoria:</strong> ${livro.categoria}</p>` : ''}
+                ${ratingHtml}
+                <p class="livro-sinopse">${livro.sinopse}</p>
+                ${livro.previewLink ? `<a href="${livro.previewLink}" target="_blank" class="livro-preview-link">📚 ${tipo === 'recomendado' ? 'Livro Clássico' : 'Ver no Open Library'}</a>` : ''}
+            </div>
+        `;
+        
+        return div;
     }
     
     function atualizarContador(quantidade) {
-        let contador = document.getElementById('contador-livros');
+        let contador = document.getElementById('contador-todos-livros');
         if (!contador) {
             contador = document.createElement('div');
-            contador.id = 'contador-livros';
+            contador.id = 'contador-todos-livros';
             contador.style.cssText = 'text-align: center; margin-bottom: 20px; font-size: 1.2rem; color: #ff4444;';
-            searchInput.parentNode.insertBefore(contador, searchInput.nextSibling);
+            const todosSection = document.getElementById('todos-livros-section');
+            if (todosSection) {
+                todosSection.insertBefore(contador, listaTodosLivros);
+            }
         }
-        contador.innerHTML = `<strong>Exibindo ${quantidade} livro${quantidade !== 1 ? 's' : ''}</strong>`;
+        contador.innerHTML = `<strong>📚 Exibindo ${quantidade} livro${quantidade !== 1 ? 's' : ''} de terror</strong>`;
     }
 
+    // Search functionality - search in both Portuguese and English titles
     searchInput.addEventListener('input', function() {
         const termo = this.value.toLowerCase();
-        const livrosFiltrados = livros.filter(livro => 
+        
+        if (termo.trim() === '') {
+            exibirTodosLivros();
+            return;
+        }
+        
+        const livrosFiltrados = livrosData.todos.filter(livro => 
             livro.titulo.toLowerCase().includes(termo) || 
-            livro.autor.toLowerCase().includes(termo)
+            (livro.tituloOriginal && livro.tituloOriginal.toLowerCase().includes(termo)) ||
+            livro.autor.toLowerCase().includes(termo) ||
+            (livro.sinopse && livro.sinopse.toLowerCase().includes(termo))
         );
-        exibirLivros(livrosFiltrados);
+        exibirTodosLivros(livrosFiltrados);
     });
 
-    // Exibição inicial
-    exibirLivros(livros);
+    // Filter button functionality
+    function setActiveFilter(filterType) {
+        // Update button states
+        if (filterType === 'recomendacao') {
+            btnRecomendacao.classList.add('active');
+            btnPesquisa.classList.remove('active');
+            secaoRecomendados.classList.add('active');
+            secaoPesquisa.classList.remove('active');
+        } else {
+            btnPesquisa.classList.add('active');
+            btnRecomendacao.classList.remove('active');
+            secaoPesquisa.classList.add('active');
+            secaoRecomendados.classList.remove('active');
+        }
+    }
+
+    // Event listeners for filter buttons
+    btnRecomendacao.addEventListener('click', function() {
+        setActiveFilter('recomendacao');
+    });
+
+    btnPesquisa.addEventListener('click', function() {
+        setActiveFilter('pesquisa');
+    });
+
+    // Handle favorite button clicks
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('favorite-btn') || e.target.closest('.favorite-btn')) {
+            const btn = e.target.classList.contains('favorite-btn') ? e.target : e.target.closest('.favorite-btn');
+            const type = btn.getAttribute('data-favorite-type');
+            const id = btn.getAttribute('data-favorite-id');
+            const data = JSON.parse(btn.getAttribute('data-favorite-data'));
+            
+            FavoritesManager.toggleFavorite(type, id, data);
+        }
+    });
+
+    // Initial display
+    if (loadingIndicator) loadingIndicator.style.display = 'none';
+    exibirRecomendados();
+    exibirTodosLivros();
+    
+    // Set initial filter to "Recomendação"
+    setActiveFilter('recomendacao');
 });

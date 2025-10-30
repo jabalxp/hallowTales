@@ -4,7 +4,7 @@
 // Cache for API results
 let moviesCache = null;
 let moviesCacheTimestamp = null;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const FILMES_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // Fetch horror movies from TMDB API
 async function fetchHorrorMovies() {
@@ -62,11 +62,12 @@ async function fetchHorrorMovies() {
                 else if (ano >= 1990) decada = '1990s';
                 else if (ano >= 1980) decada = '1980s';
                 else if (ano >= 1970) decada = '1970s';
-                else decada = 'Clássicos';
+                else if (ano >= 1960) decada = '1960s';
+                else decada = '1950s'; // For very old classics
             }
 
-            // Determine type (modern vs classic)
-            const tipo = ano >= 2000 ? 'Moderno' : 'Clássico';
+            // Determine type (modern vs classic) - lowercase without accents for filter compatibility
+            const tipo = ano >= 2000 ? 'moderno' : 'classico';
 
             return {
                 id: `movie-${movie.id}`,
@@ -108,7 +109,7 @@ function getFallbackMovies() {
             sinopse: 'Uma mãe desesperada busca ajuda de dois padres para salvar sua filha de uma possessão demoníaca.',
             poster: 'https://image.tmdb.org/t/p/w500/5x0CeVHJI8tcDx8tUUwYHQSNILq.jpg',
             decada: '1970s',
-            tipo: 'Clássico',
+            tipo: 'classico',
             genero: 'Horror'
         },
         {
@@ -119,7 +120,7 @@ function getFallbackMovies() {
             sinopse: 'Uma família lida com segredos sombrios e forças sobrenaturais após a morte da matriarca.',
             poster: 'https://image.tmdb.org/t/p/w500/p5pEJAgiWeb2DPGcWrQi9Rc9Cq9.jpg',
             decada: '2010s',
-            tipo: 'Moderno',
+            tipo: 'moderno',
             genero: 'Horror'
         },
         {
@@ -130,7 +131,7 @@ function getFallbackMovies() {
             sinopse: 'Um escritor aceita trabalho como zelador de hotel isolado durante o inverno, levando sua família à loucura.',
             poster: 'https://image.tmdb.org/t/p/w500/b6ko0IKC8MdYBBPkkA1aBPLe2yz.jpg',
             decada: '1980s',
-            tipo: 'Clássico',
+            tipo: 'classico',
             genero: 'Horror'
         },
         {
@@ -141,7 +142,7 @@ function getFallbackMovies() {
             sinopse: 'Em 1630, uma família puritana enfrenta forças malignas na Nova Inglaterra.',
             poster: 'https://image.tmdb.org/t/p/w500/cCN7LFHSgmg6kNdRAZ4dIrIv9RK.jpg',
             decada: '2010s',
-            tipo: 'Moderno',
+            tipo: 'moderno',
             genero: 'Horror'
         },
         {
@@ -151,8 +152,8 @@ function getFallbackMovies() {
             diretor: 'George A. Romero',
             sinopse: 'Sobreviventes se refugiam em uma casa durante um apocalipse zumbi.',
             poster: 'https://image.tmdb.org/t/p/w500/inNUOa9WZGdyRXQlt7eqmHtCttl.jpg',
-            decada: 'Clássicos',
-            tipo: 'Clássico',
+            decada: '1960s',
+            tipo: 'classico',
             genero: 'Horror'
         },
         {
@@ -163,7 +164,7 @@ function getFallbackMovies() {
             sinopse: 'Um casal em crise viaja para festival sueco que acontece a cada 90 anos, revelando rituais perturbadores.',
             poster: 'https://image.tmdb.org/t/p/w500/9Z4gS3TkD9H4RqYLPWp4BLnJjYE.jpg',
             decada: '2010s',
-            tipo: 'Moderno',
+            tipo: 'moderno',
             genero: 'Horror'
         },
         {
@@ -174,7 +175,7 @@ function getFallbackMovies() {
             sinopse: 'Michael Myers escapa do manicômio e retorna à sua cidade natal para matar.',
             poster: 'https://image.tmdb.org/t/p/w500/igm0F6ka6vLRydH0P8jU8m9FP0R.jpg',
             decada: '1970s',
-            tipo: 'Clássico',
+            tipo: 'classico',
             genero: 'Horror'
         },
         {
@@ -185,7 +186,7 @@ function getFallbackMovies() {
             sinopse: 'Investigadores paranormais Ed e Lorraine Warren ajudam família aterrorizada por presença sombria.',
             poster: 'https://image.tmdb.org/t/p/w500/6xsDI4WFrZwyDirbH7nVxZJ5UF1.jpg',
             decada: '2010s',
-            tipo: 'Moderno',
+            tipo: 'moderno',
             genero: 'Horror'
         },
         {
@@ -195,8 +196,8 @@ function getFallbackMovies() {
             diretor: 'Alfred Hitchcock',
             sinopse: 'Mulher em fuga encontra motel isolado administrado por jovem perturbado e sua mãe.',
             poster: 'https://image.tmdb.org/t/p/w500/iIdJqFdqXS5fdt6jOlUSEElCWkA.jpg',
-            decada: 'Clássicos',
-            tipo: 'Clássico',
+            decada: '1960s',
+            tipo: 'classico',
             genero: 'Horror'
         },
         {
@@ -207,7 +208,7 @@ function getFallbackMovies() {
             sinopse: 'Jovem visita família da namorada e descobre segredos perturbadores.',
             poster: 'https://image.tmdb.org/t/p/w500/gLhHHZUzeseRXShoDyC4VqLgsNv.jpg',
             decada: '2010s',
-            tipo: 'Moderno',
+            tipo: 'moderno',
             genero: 'Horror'
         },
         {
@@ -218,7 +219,7 @@ function getFallbackMovies() {
             sinopse: 'Grupo de amigos encontra família de canibais no Texas.',
             poster: 'https://image.tmdb.org/t/p/w500/w8xLlkr7bTk5dMNwJpZmIbGZIxw.jpg',
             decada: '1970s',
-            tipo: 'Clássico',
+            tipo: 'classico',
             genero: 'Horror'
         },
         {
@@ -229,7 +230,7 @@ function getFallbackMovies() {
             sinopse: 'Grupo de crianças enfrenta entidade maligna que assume forma de palhaço.',
             poster: 'https://image.tmdb.org/t/p/w500/i1JJJlB6SjZADEWHwYPHoUGKxrS.jpg',
             decada: '2010s',
-            tipo: 'Moderno',
+            tipo: 'moderno',
             genero: 'Horror'
         },
         {
@@ -240,7 +241,7 @@ function getFallbackMovies() {
             sinopse: 'Tripulação de nave espacial enfrenta criatura alienígena mortal.',
             poster: 'https://image.tmdb.org/t/p/w500/jVKVKyAP2rJ4nWV5WVEPJUMc0wP.jpg',
             decada: '1970s',
-            tipo: 'Clássico',
+            tipo: 'classico',
             genero: 'Horror'
         },
         {
@@ -251,7 +252,7 @@ function getFallbackMovies() {
             sinopse: 'Adolescentes são caçados em seus sonhos por Freddy Krueger.',
             poster: 'https://image.tmdb.org/t/p/w500/kZzE9jdjO63M0rYXHp1a6MAg3bR.jpg',
             decada: '1980s',
-            tipo: 'Clássico',
+            tipo: 'classico',
             genero: 'Horror'
         },
         {
@@ -262,7 +263,7 @@ function getFallbackMovies() {
             sinopse: 'Casal instala câmeras em casa para documentar atividade sobrenatural.',
             poster: 'https://image.tmdb.org/t/p/w500/rxuFWBQ3fW3GJWa01tTXzTN7fDt.jpg',
             decada: '2000s',
-            tipo: 'Moderno',
+            tipo: 'moderno',
             genero: 'Horror'
         },
         {
@@ -273,7 +274,7 @@ function getFallbackMovies() {
             sinopse: 'Assassino mascarado aterroriza cidade seguindo regras de filmes de terror.',
             poster: 'https://image.tmdb.org/t/p/w500/7OyKUmT9Lj0bMLEvdQ8HlAeN6p1.jpg',
             decada: '1990s',
-            tipo: 'Moderno',
+            tipo: 'moderno',
             genero: 'Horror'
         },
         {
@@ -284,7 +285,7 @@ function getFallbackMovies() {
             sinopse: 'Terror brasileiro sobre médico que descobre segredos em necrotério.',
             poster: 'https://image.tmdb.org/t/p/w500/hMjrKPXYZjWvHMZN0YYqHqKgZ8A.jpg',
             decada: '2020s',
-            tipo: 'Moderno',
+            tipo: 'moderno',
             genero: 'Horror'
         },
         {
@@ -295,7 +296,7 @@ function getFallbackMovies() {
             sinopse: 'Dois faroleiros lutam contra sanidade em ilha isolada.',
             poster: 'https://image.tmdb.org/t/p/w500/vjEJSOD1fjpjSMIHlwHHnLZPDFz.jpg',
             decada: '2010s',
-            tipo: 'Moderno',
+            tipo: 'moderno',
             genero: 'Horror'
         },
         {
@@ -306,7 +307,7 @@ function getFallbackMovies() {
             sinopse: 'Adolescente com poderes telecinéticos se vinga de seus atormentadores.',
             poster: 'https://image.tmdb.org/t/p/w500/uc3OvgmbnYaS5Y0BOjSmC1EmSz4.jpg',
             decada: '1970s',
-            tipo: 'Clássico',
+            tipo: 'classico',
             genero: 'Horror'
         },
         {
@@ -317,7 +318,7 @@ function getFallbackMovies() {
             sinopse: 'Agente do FBI caça serial killer ocultista em thriller psicológico.',
             poster: 'https://image.tmdb.org/t/p/w500/8CPF7Q7F9tLfEjbbXGwHpxg6qLC.jpg',
             decada: '2020s',
-            tipo: 'Moderno',
+            tipo: 'moderno',
             genero: 'Horror'
         }
     ];

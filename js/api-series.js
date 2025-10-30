@@ -4,7 +4,7 @@
 // Cache for API results
 let seriesCache = null;
 let seriesCacheTimestamp = null;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const SERIES_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // Fetch horror series from TMDB API
 async function fetchHorrorSeries() {
@@ -55,10 +55,11 @@ async function fetchHorrorSeries() {
             const ano = series.first_air_date ? new Date(series.first_air_date).getFullYear() : 'N/A';
             
             // Simplify streaming info (would need additional endpoints for accurate data)
+            // Using consistent naming with the filter options in HTML
             let streaming = [];
             if (series.popularity > 100) streaming.push('Netflix');
-            if (series.vote_average > 7.5) streaming.push('Amazon Prime');
-            if (ano >= 2020) streaming.push('Max');
+            if (series.vote_average > 7.5) streaming.push('Prime Video'); // Changed from 'Amazon Prime'
+            if (ano >= 2020) streaming.push('HBO Max'); // Changed from 'Max'
             if (streaming.length === 0) streaming = ['Vários'];
 
             return {
@@ -101,7 +102,7 @@ function getFallbackSeries() {
             sinopse: 'Sobreviventes lutam em mundo pós-apocalíptico dominado por zumbis.',
             poster: 'https://image.tmdb.org/t/p/w500/xf9wuDcqlUPWABZNeDKPbZUjWx0.jpg',
             temporadas: 11,
-            streaming: 'Netflix, Amazon Prime',
+            streaming: 'Netflix, Prime Video',
             genero: 'Horror, Drama'
         },
         {
@@ -145,7 +146,7 @@ function getFallbackSeries() {
             sinopse: 'Prequel de Psicose mostrando juventude de Norman Bates.',
             poster: 'https://image.tmdb.org/t/p/w500/1dLyLTl4Ea5PFZnmSpEAqQYMqk7.jpg',
             temporadas: 5,
-            streaming: 'Netflix, Amazon Prime',
+            streaming: 'Netflix, Prime Video',
             genero: 'Horror, Thriller'
         },
         {
@@ -156,7 +157,7 @@ function getFallbackSeries() {
             sinopse: 'Antologia sobre expedições históricas que encontraram o horror.',
             poster: 'https://image.tmdb.org/t/p/w500/7w0EtEh4aMfN2pNd4jNnP4lsFrO.jpg',
             temporadas: 2,
-            streaming: 'Amazon Prime',
+            streaming: 'Prime Video',
             genero: 'Horror, Drama'
         },
         {
@@ -233,7 +234,7 @@ function getFallbackSeries() {
             sinopse: 'Baseado em Stephen King, família enfrenta maldição ancestral.',
             poster: 'https://image.tmdb.org/t/p/w500/aKmRXqyLNRmTqF07w9JTxcEZPVz.jpg',
             temporadas: 1,
-            streaming: 'Amazon Prime',
+            streaming: 'Prime Video',
             genero: 'Horror, Drama'
         },
         {
@@ -244,7 +245,7 @@ function getFallbackSeries() {
             sinopse: 'Cidade misteriosa prende visitantes e criaturas noturnas os caçam.',
             poster: 'https://image.tmdb.org/t/p/w500/cjXLrg4f4Fb29plorfCeTSWHmyn.jpg',
             temporadas: 3,
-            streaming: 'Amazon Prime',
+            streaming: 'Prime Video',
             genero: 'Horror, Mystery'
         },
         {
@@ -255,7 +256,7 @@ function getFallbackSeries() {
             sinopse: 'Investigação de assassinato revela forças sobrenaturais.',
             poster: 'https://image.tmdb.org/t/p/w500/eMTa6CWvUdzZDhwQJOcYPOG93yd.jpg',
             temporadas: 1,
-            streaming: 'Max',
+            streaming: 'HBO Max',
             genero: 'Horror, Mystery'
         },
         {
@@ -288,7 +289,7 @@ function getFallbackSeries() {
             sinopse: 'Homem negro enfrenta racismo e terror lovecraftiano nos anos 50.',
             poster: 'https://image.tmdb.org/t/p/w500/6mIKHERADILbBBXbYg53lDwE1CQ.jpg',
             temporadas: 1,
-            streaming: 'Max',
+            streaming: 'HBO Max',
             genero: 'Horror, Drama'
         },
         {

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test - HallowTales</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a0033 0%, #000000 100%);
+            color: #00ff00;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #8b00ff;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #8b00ff;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .api-section {
+            background: rgba(139, 0, 255, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #8b00ff;
+        }
+        
+        .api-section h2 {
+            color: #00ffff;
+            margin-bottom: 15px;
+        }
+        
+        .status {
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+        
+        .status.error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff0000;
+            color: #ff0000;
+        }
+        
+        .status.warning {
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid #ffa500;
+            color: #ffa500;
+        }
+        
+        button {
+            background: #8b00ff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #6a0dad;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 0, 255, 0.5);
+        }
+        
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .result-item {
+            background: rgba(139, 0, 255, 0.2);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 3px solid #00ffff;
+        }
+        
+        .result-item strong {
+            color: #00ffff;
+        }
+        
+        pre {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            color: #00ff00;
+            font-size: 0.9rem;
+        }
+        
+        .loader {
+            display: none;
+            border: 3px solid rgba(139, 0, 255, 0.3);
+            border-top: 3px solid #8b00ff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        
+        .loader.active {
+            display: block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #00ffff;
+            color: #000;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .back-link:hover {
+            background: #00cc cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 API Tester - HallowTales</h1>
+        <p style="text-align: center; color: #00ffff; margin-bottom: 30px;">
+            Teste suas chaves de API antes de usar no site principal
+        </p>
+        
+        <!-- TMDB Section -->
+        <div class="api-section">
+            <h2>🎬 TMDB API (Filmes & Séries)</h2>
+            <div id="tmdb-status" class="status warning">⏳ Aguardando teste...</div>
+            <button onclick="testTMDB()">Testar TMDB</button>
+            <button onclick="testTMDBMovies()">Buscar Filmes de Terror</button>
+            <button onclick="testTMDBSeries()">Buscar Séries de Terror</button>
+            <div class="loader" id="tmdb-loader"></div>
+            <div id="tmdb-results" class="results" style="display: none;"></div>
+        </div>
+        
+        <!-- RAWG Section -->
+        <div class="api-section">
+            <h2>🎮 RAWG API (Jogos)</h2>
+            <div id="rawg-status" class="status warning">⏳ Aguardando teste...</div>
+            <button onclick="testRAWG()">Testar RAWG</button>
+            <button onclick="testRAWGGames()">Buscar Jogos de Terror</button>
+            <div class="loader" id="rawg-loader"></div>
+            <div id="rawg-results" class="results" style="display: none;"></div>
+        </div>
+        
+        <!-- Open Library Section -->
+        <div class="api-section">
+            <h2>📚 Open Library API (Livros)</h2>
+            <div id="openlib-status" class="status warning">⏳ Não requer chave de API</div>
+            <button onclick="testOpenLibrary()">Testar Open Library</button>
+            <button onclick="testOpenLibrarySearch()">Buscar Livros de Terror</button>
+            <div class="loader" id="openlib-loader"></div>
+            <div id="openlib-results" class="results" style="display: none;"></div>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="index.html" class="back-link">← Voltar para o Site</a>
+        </div>
+    </div>
+    
+    <script src="js/api-config.js"></script>
+    <script>
+        // Helper functions
+        function showLoader(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        
+        function hideLoader(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        
+        function showStatus(id, message, type) {
+            const elem = document.getElementById(id);
+            elem.textContent = message;
+            elem.className = `status ${type}`;
+        }
+        
+        function showResults(id, data) {
+            const elem = document.getElementById(id);
+            elem.style.display = 'block';
+            elem.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        }
+        
+        // TMDB Tests
+        async function testTMDB() {
+            showLoader('tmdb-loader');
+            showStatus('tmdb-status', '🔄 Testando conexão...', 'warning');
+            
+            if (!API_CONFIG.TMDB.API_KEY || API_CONFIG.TMDB.API_KEY === 'YOUR_TMDB_API_KEY_HERE') {
+                hideLoader('tmdb-loader');
+                showStatus('tmdb-status', '❌ Chave de API não configurada! Edite js/api-config.js', 'error');
+                return;
+            }
+            
+            try {
+                const url = `${API_CONFIG.TMDB.BASE_URL}/movie/550?api_key=${API_CONFIG.TMDB.API_KEY}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                hideLoader('tmdb-loader');
+                showStatus('tmdb-status', '✅ TMDB API funcionando! Filme encontrado: ' + data.title, 'success');
+                showResults('tmdb-results', data);
+            } catch (error) {
+                hideLoader('tmdb-loader');
+                showStatus('tmdb-status', '❌ Erro: ' + error.message, 'error');
+            }
+        }
+        
+        async function testTMDBMovies() {
+            showLoader('tmdb-loader');
+            
+            if (!API_CONFIG.TMDB.API_KEY || API_CONFIG.TMDB.API_KEY === 'YOUR_TMDB_API_KEY_HERE') {
+                hideLoader('tmdb-loader');
+                showStatus('tmdb-status', '❌ Configure a chave de API primeiro!', 'error');
+                return;
+            }
+            
+            try {
+                const url = `${API_CONFIG.TMDB.BASE_URL}/discover/movie?api_key=${API_CONFIG.TMDB.API_KEY}&with_genres=27&sort_by=vote_average.desc&vote_count.gte=500&language=pt-BR&page=1`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                hideLoader('tmdb-loader');
+                if (data.results && data.results.length > 0) {
+                    showStatus('tmdb-status', `✅ ${data.results.length} filmes encontrados!`, 'success');
+                    const resultsDiv = document.getElementById('tmdb-results');
+                    resultsDiv.style.display = 'block';
+                    resultsDiv.innerHTML = data.results.slice(0, 5).map(movie => `
+                        <div class="result-item">
+                            <strong>${movie.title}</strong> (${movie.release_date?.substring(0, 4)})<br>
+                            ⭐ Nota: ${movie.vote_average.toFixed(1)} | 👥 Votos: ${movie.vote_count}
+                        </div>
+                    `).join('');
+                } else {
+                    showStatus('tmdb-status', '⚠️ Nenhum resultado encontrado', 'warning');
+                }
+            } catch (error) {
+                hideLoader('tmdb-loader');
+                showStatus('tmdb-status', '❌ Erro: ' + error.message, 'error');
+            }
+        }
+        
+        async function testTMDBSeries() {
+            showLoader('tmdb-loader');
+            
+            if (!API_CONFIG.TMDB.API_KEY || API_CONFIG.TMDB.API_KEY === 'YOUR_TMDB_API_KEY_HERE') {
+                hideLoader('tmdb-loader');
+                showStatus('tmdb-status', '❌ Configure a chave de API primeiro!', 'error');
+                return;
+            }
+            
+            try {
+                const url = `${API_CONFIG.TMDB.BASE_URL}/discover/tv?api_key=${API_CONFIG.TMDB.API_KEY}&with_genres=10765&with_keywords=9663&language=pt-BR&page=1`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                hideLoader('tmdb-loader');
+                if (data.results && data.results.length > 0) {
+                    showStatus('tmdb-status', `✅ ${data.results.length} séries encontradas!`, 'success');
+                    const resultsDiv = document.getElementById('tmdb-results');
+                    resultsDiv.style.display = 'block';
+                    resultsDiv.innerHTML = data.results.slice(0, 5).map(serie => `
+                        <div class="result-item">
+                            <strong>${serie.name}</strong> (${serie.first_air_date?.substring(0, 4)})<br>
+                            ⭐ Nota: ${serie.vote_average.toFixed(1)}
+                        </div>
+                    `).join('');
+                } else {
+                    showStatus('tmdb-status', '⚠️ Nenhum resultado encontrado', 'warning');
+                }
+            } catch (error) {
+                hideLoader('tmdb-loader');
+                showStatus('tmdb-status', '❌ Erro: ' + error.message, 'error');
+            }
+        }
+        
+        // RAWG Tests
+        async function testRAWG() {
+            showLoader('rawg-loader');
+            showStatus('rawg-status', '🔄 Testando conexão...', 'warning');
+            
+            if (!API_CONFIG.RAWG.API_KEY || API_CONFIG.RAWG.API_KEY === 'YOUR_RAWG_API_KEY_HERE') {
+                hideLoader('rawg-loader');
+                showStatus('rawg-status', '❌ Chave de API não configurada! Edite js/api-config.js', 'error');
+                return;
+            }
+            
+            try {
+                const url = `${API_CONFIG.RAWG.BASE_URL}/games?key=${API_CONFIG.RAWG.API_KEY}&page_size=1`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                hideLoader('rawg-loader');
+                showStatus('rawg-status', '✅ RAWG API funcionando! Jogo encontrado: ' + data.results[0].name, 'success');
+                showResults('rawg-results', data.results[0]);
+            } catch (error) {
+                hideLoader('rawg-loader');
+                showStatus('rawg-status', '❌ Erro: ' + error.message, 'error');
+            }
+        }
+        
+        async function testRAWGGames() {
+            showLoader('rawg-loader');
+            
+            if (!API_CONFIG.RAWG.API_KEY || API_CONFIG.RAWG.API_KEY === 'YOUR_RAWG_API_KEY_HERE') {
+                hideLoader('rawg-loader');
+                showStatus('rawg-status', '❌ Configure a chave de API primeiro!', 'error');
+                return;
+            }
+            
+            try {
+                const url = `${API_CONFIG.RAWG.BASE_URL}/games?key=${API_CONFIG.RAWG.API_KEY}&genres=4&ordering=-rating&page_size=10`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                hideLoader('rawg-loader');
+                if (data.results && data.results.length > 0) {
+                    showStatus('rawg-status', `✅ ${data.results.length} jogos encontrados!`, 'success');
+                    const resultsDiv = document.getElementById('rawg-results');
+                    resultsDiv.style.display = 'block';
+                    resultsDiv.innerHTML = data.results.map(game => `
+                        <div class="result-item">
+                            <strong>${game.name}</strong> (${game.released?.substring(0, 4) || 'N/A'})<br>
+                            ⭐ Rating: ${game.rating?.toFixed(1) || 'N/A'} | 🏆 Metacritic: ${game.metacritic || 'N/A'}
+                        </div>
+                    `).join('');
+                } else {
+                    showStatus('rawg-status', '⚠️ Nenhum resultado encontrado', 'warning');
+                }
+            } catch (error) {
+                hideLoader('rawg-loader');
+                showStatus('rawg-status', '❌ Erro: ' + error.message, 'error');
+            }
+        }
+        
+        // Open Library Tests
+        async function testOpenLibrary() {
+            showLoader('openlib-loader');
+            showStatus('openlib-status', '🔄 Testando conexão...', 'warning');
+            
+            try {
+                const url = 'https://openlibrary.org/search.json?q=horror&limit=1';
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                hideLoader('openlib-loader');
+                showStatus('openlib-status', '✅ Open Library funcionando! ' + data.num_found + ' livros no banco', 'success');
+                showResults('openlib-results', data.docs[0]);
+            } catch (error) {
+                hideLoader('openlib-loader');
+                showStatus('openlib-status', '❌ Erro: ' + error.message, 'error');
+            }
+        }
+        
+        async function testOpenLibrarySearch() {
+            showLoader('openlib-loader');
+            
+            try {
+                const url = 'https://openlibrary.org/search.json?q=horror&limit=10';
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                hideLoader('openlib-loader');
+                if (data.docs && data.docs.length > 0) {
+                    showStatus('openlib-status', `✅ ${data.docs.length} livros encontrados!`, 'success');
+                    const resultsDiv = document.getElementById('openlib-results');
+                    resultsDiv.style.display = 'block';
+                    resultsDiv.innerHTML = data.docs.map(book => `
+                        <div class="result-item">
+                            <strong>${book.title}</strong> (${book.first_publish_year || 'N/A'})<br>
+                            ✍️ Autor: ${book.author_name?.[0] || 'Unknown'}
+                        </div>
+                    `).join('');
+                } else {
+                    showStatus('openlib-status', '⚠️ Nenhum resultado encontrado', 'warning');
+                }
+            } catch (error) {
+                hideLoader('openlib-loader');
+                showStatus('openlib-status', '❌ Erro: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
