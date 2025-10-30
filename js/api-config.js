@@ -5,7 +5,7 @@ const API_CONFIG = {
     // TMDB API - The Movie Database
     // Get your free API key at: https://www.themoviedb.org/settings/api
     TMDB: {
-        API_KEY: 'YOUR_TMDB_API_KEY_HERE', // Replace with your TMDB API key
+        API_KEY: '2213be1811fd9f3901a97068e65ea67e', // Replace with your TMDB API key
         BASE_URL: 'https://api.themoviedb.org/3',
         IMAGE_BASE_URL: 'https://image.tmdb.org/t/p',
         IMAGE_SIZES: {
@@ -18,7 +18,7 @@ const API_CONFIG = {
     // RAWG API - Video Games Database
     // Get your free API key at: https://rawg.io/apidocs
     RAWG: {
-        API_KEY: 'YOUR_RAWG_API_KEY_HERE', // Replace with your RAWG API key
+        API_KEY: '300be8282dfc48c49a2e2f26268e74ae', // Replace with your RAWG API key
         BASE_URL: 'https://api.rawg.io/api'
     },
 

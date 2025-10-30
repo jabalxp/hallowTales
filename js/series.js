@@ -1,6 +1,9 @@
 // Dados de Séries de Terror - HallowTales
+// DEPRECATED: This file is now only used as fallback data
+// The actual data comes from api-series.js
 
-const seriesData = [
+// Fallback data (not used when API is working)
+const seriesDataFallback = [
     {
         id: 'stranger-things',
         titulo: 'Stranger Things',

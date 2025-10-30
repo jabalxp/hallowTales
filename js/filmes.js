@@ -1,6 +1,9 @@
 // Dados de Filmes de Terror - HallowTales
+// DEPRECATED: This file is now only used as fallback data
+// The actual data comes from api-filmes.js
 
-const filmesData = [
+// Fallback data (not used when API is working)
+const filmesDataFallback = [
     {
         id: 'halloween-1978',
         titulo: 'Halloween',

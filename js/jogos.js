@@ -1,6 +1,9 @@
 // Dados de Jogos de Terror - HallowTales
+// DEPRECATED: This file is now only used as fallback data
+// The actual data comes from api-jogos.js
 
-const jogosData = [
+// Fallback data (not used when API is working)
+const jogosDataFallback = [
     {
         id: 'silent-hill-2',
         titulo: 'Silent Hill 2',
