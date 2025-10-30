@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogos de Terror - HallowTales</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>HallowTales</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">🏠 Início</a></li>
+                <li><a href="livros.html">📚 Livros</a></li>
+                <li><a href="cidades.html">🏛️ Cidades</a></li>
+                <li><a href="filmes.html">🎬 Filmes & Séries</a></li>
+                <li><a href="jogos.html">🎮 Jogos</a></li>
+                <li><a href="quiz.html">❓ Quiz</a></li>
+                <li><a href="favoritos.html">❤️ Favoritos</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="jogos">
+            <h2>🎮 Jogos de Terror</h2>
+            <p style="text-align: center; color: #00ffff; font-size: 1.1rem; margin-bottom: 20px;">Os jogos que vão fazer você ter medo de jogar sozinho no escuro</p>
+            
+            <!-- Filtros e busca -->
+            <div class="filters-container">
+                <input type="text" id="search-jogos" placeholder="🔍 Buscar jogo...">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter-cat="all">Todos</button>
+                    <button class="filter-btn" data-filter-cat="Survival Horror">Survival Horror</button>
+                    <button class="filter-btn" data-filter-cat="Psychological Horror">Psicológico</button>
+                    <button class="filter-btn" data-filter-cat="Co-op Horror">Co-op</button>
+                    <button class="filter-btn" data-filter-cat="Indie Horror">Indie</button>
+                </div>
+            </div>
+
+            <div id="lista-jogos" class="media-grid">
+                <!-- Os jogos serão inseridos aqui via JavaScript -->
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-decoration">🕷️ 🕸️ 🦇 🎃 🦇 🕸️ 🕷️</div>
+        <p>&copy; 2025 HallowTales. Todos os direitos reservados.</p>
+        <p class="footer-message">👻 Feliz Halloween! Que seus pesadelos sejam aterrorizantes! 👻</p>
+    </footer>
+    <script src="js/favoritos.js"></script>
+    <script src="js/api-config.js"></script>
+    <script src="js/api-jogos.js"></script>
+    <script src="js/jogos.js"></script>
+    <script>
+        // Renderiza jogos
+        function renderJogos(jogos) {
+            const container = document.getElementById('lista-jogos');
+            container.innerHTML = '';
+
+            if (jogos.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">Nenhum jogo encontrado 😢</p>';
+                return;
+            }
+
+            jogos.forEach(jogo => {
+                const card = document.createElement('div');
+                card.className = 'media-card';
+                card.setAttribute('data-item-data', JSON.stringify({
+                    titulo: jogo.titulo,
+                    ano: jogo.ano,
+                    desenvolvedor: jogo.desenvolvedor,
+                    poster: jogo.poster
+                }));
+
+                card.innerHTML = `
+                    <div class="media-poster">
+                        <img src="${jogo.poster}" alt="${jogo.titulo}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x450/1a001a/00ff00?text=${encodeURIComponent(jogo.titulo)}'">
+                        <button class="favorite-btn" 
+                                data-favorite-type="jogos" 
+                                data-favorite-id="${jogo.id}"
+                                title="Adicionar aos favoritos">
+                            🤍
+                        </button>
+                        <span class="nota-badge">${jogo.nota}/10</span>
+                    </div>
+                    <div class="media-info">
+                        <h3>${jogo.titulo}</h3>
+                        <p class="media-year">${jogo.ano} • ${jogo.desenvolvedor}</p>
+                        <p class="media-genre">${jogo.categoria}</p>
+                        <p class="media-platforms">🎮 ${jogo.plataformas}</p>
+                        <p class="media-sinopse">${jogo.sinopse}</p>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            FavoritesManager.initializeFavoriteButtons();
+        }
+
+        // Filtros
+        let currentCategoryFilter = 'all';
+
+        function applyFilters() {
+            let filtered = jogosData;
+
+            // Filtro de categoria
+            if (currentCategoryFilter !== 'all') {
+                filtered = filtered.filter(j => j.categoria === currentCategoryFilter);
+            }
+
+            // Busca
+            const searchTerm = document.getElementById('search-jogos').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(j => 
+                    j.titulo.toLowerCase().includes(searchTerm) ||
+                    j.desenvolvedor.toLowerCase().includes(searchTerm) ||
+                    j.sinopse.toLowerCase().includes(searchTerm) ||
+                    j.plataformas.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Ordenar por nota
+            filtered.sort((a, b) => b.nota - a.nota);
+
+            renderJogos(filtered);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize games from API
+            initializeGames().then(() => {
+                // Renderiza inicial (ordenado por nota)
+                const sortedJogos = [...jogosData].sort((a, b) => b.nota - a.nota);
+                renderJogos(sortedJogos);
+            }).catch(error => {
+                console.error('Error loading games:', error);
+                // Show error message
+                document.getElementById('lista-jogos').innerHTML = 
+                    '<p style="text-align: center; color: #ff0000; grid-column: 1/-1;">❌ Erro ao carregar jogos. Por favor, configure sua chave da API RAWG.</p>';
+            });
+
+            // Filtros de categoria
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentCategoryFilter = e.target.getAttribute('data-filter-cat');
+                    applyFilters();
+                });
+            });
+
+            document.getElementById('search-jogos').addEventListener('input', applyFilters);
+        });
+    </script>
+</body>
+</html>

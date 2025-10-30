@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Terror - HallowTales</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>HallowTales</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">🏠 Início</a></li>
+                <li><a href="livros.html">📚 Livros</a></li>
+                <li><a href="cidades.html">🏛️ Cidades</a></li>
+                <li><a href="filmes.html">🎬 Filmes & Séries</a></li>
+                <li><a href="jogos.html">🎮 Jogos</a></li>
+                <li><a href="quiz.html">❓ Quiz</a></li>
+                <li><a href="favoritos.html">❤️ Favoritos</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="quiz">
+            <h2>❓ Quiz: Qual Filme de Terror Você Deveria Assistir?</h2>
+            <p style="text-align: center; color: #00ffff; font-size: 1.1rem; margin-bottom: 30px;">Responda às perguntas e descubra o filme perfeito para você!</p>
+            
+            <div id="quiz-container">
+                <div id="quiz-progress">
+                    <div id="progress-bar"></div>
+                </div>
+                
+                <div id="quiz-content">
+                    <!-- As perguntas serão inseridas aqui -->
+                </div>
+
+                <div id="quiz-resultado" style="display: none;">
+                    <!-- O resultado será inserido aqui -->
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-decoration">🕷️ 🕸️ 🦇 🎃 🦇 🕸️ 🕷️</div>
+        <p>&copy; 2025 HallowTales. Todos os direitos reservados.</p>
+        <p class="footer-message">👻 Feliz Halloween! Que seus pesadelos sejam aterrorizantes! 👻</p>
+    </footer>
+    <script src="js/favoritos.js"></script>
+    <script>
+        const quizData = {
+            perguntas: [
+                {
+                    pergunta: "Qual é o seu medo favorito?",
+                    opcoes: [
+                        { texto: "👻 Fantasmas e entidades sobrenaturais", pontos: { sobrenatural: 3 } },
+                        { texto: "🔪 Serial killers e assassinos", pontos: { slasher: 3 } },
+                        { texto: "🧠 Perder a sanidade", pontos: { psicologico: 3 } },
+                        { texto: "👽 Criaturas e alienígenas", pontos: { criatura: 3 } }
+                    ]
+                },
+                {
+                    pergunta: "Qual ambiente te assusta mais?",
+                    opcoes: [
+                        { texto: "🏚️ Casa ou hotel abandonado", pontos: { sobrenatural: 2, psicologico: 1 } },
+                        { texto: "🌲 Floresta isolada", pontos: { slasher: 2, criatura: 1 } },
+                        { texto: "🏥 Hospital ou asilo", pontos: { psicologico: 2, sobrenatural: 1 } },
+                        { texto: "🚀 Espaço ou lugar claustrofóbico", pontos: { criatura: 3 } }
+                    ]
+                },
+                {
+                    pergunta: "Você prefere terror...",
+                    opcoes: [
+                        { texto: "📖 Com história profunda e simbolismo", pontos: { psicologico: 3 } },
+                        { texto: "😱 Com muitos sustos e jump scares", pontos: { sobrenatural: 2, slasher: 1 } },
+                        { texto: "🩸 Gore e violência explícita", pontos: { slasher: 3 } },
+                        { texto: "😰 Tensão constante e atmosfera", pontos: { criatura: 2, psicologico: 1 } }
+                    ]
+                },
+                {
+                    pergunta: "Qual década de filmes você prefere?",
+                    opcoes: [
+                        { texto: "📼 Anos 70-80 (clássicos)", pontos: { slasher: 2, classico: 3 } },
+                        { texto: "📹 Anos 90-2000", pontos: { sobrenatural: 1, classico: 2 } },
+                        { texto: "🎬 Anos 2010+ (modernos)", pontos: { psicologico: 2, moderno: 3 } },
+                        { texto: "🤷 Não importa, se for bom!", pontos: { sobrenatural: 1, criatura: 1 } }
+                    ]
+                },
+                {
+                    pergunta: "O que te deixa mais desconfortável?",
+                    opcoes: [
+                        { texto: "🤯 Não saber o que é real", pontos: { psicologico: 3 } },
+                        { texto: "😈 Possessões demoníacas", pontos: { sobrenatural: 3 } },
+                        { texto: "🔪 Perseguição implacável", pontos: { slasher: 3 } },
+                        { texto: "🦠 Contágio ou infestação", pontos: { criatura: 3 } }
+                    ]
+                },
+                {
+                    pergunta: "Como você gosta de assistir filmes de terror?",
+                    opcoes: [
+                        { texto: "👥 Com amigos gritando juntos", pontos: { slasher: 2, sobrenatural: 1 } },
+                        { texto: "🧘 Sozinho, absorvendo a atmosfera", pontos: { psicologico: 3 } },
+                        { texto: "💑 Com alguém para se agarrar", pontos: { sobrenatural: 2 } },
+                        { texto: "📱 Com as luzes acesas e o celular perto", pontos: { criatura: 1 } }
+                    ]
+                },
+                {
+                    pergunta: "Qual elemento sobrenatural te intriga mais?",
+                    opcoes: [
+                        { texto: "👁️ Visões e premonições", pontos: { psicologico: 2, sobrenatural: 1 } },
+                        { texto: "🧿 Maldições e rituais", pontos: { sobrenatural: 3 } },
+                        { texto: "🧬 Mutações e transformações", pontos: { criatura: 3 } },
+                        { texto: "⏰ Loops temporais", pontos: { psicologico: 2 } }
+                    ]
+                },
+                {
+                    pergunta: "Final favorito:",
+                    opcoes: [
+                        { texto: "😱 Twist mind-blowing", pontos: { psicologico: 3 } },
+                        { texto: "😈 O mal vence", pontos: { sobrenatural: 2, slasher: 1 } },
+                        { texto: "😌 Protagonista sobrevive", pontos: { criatura: 2 } },
+                        { texto: "😰 Final aberto e ambíguo", pontos: { psicologico: 2, moderno: 1 } }
+                    ]
+                }
+            ],
+            resultados: {
+                sobrenatural: {
+                    filme: "O Exorcista (1973)",
+                    poster: "https://m.media-amazon.com/images/M/MV5BYWFlZGY2NDktY2ZjOS00ZGVmLTg0ZDAtZDY4MTM1ODU4ZjljXkEyXkFqcGdeQXVyMjUzOTY1NTc@._V1_FMjpg_UX1000_.jpg",
+                    descricao: "Você aprecia o terror sobrenatural clássico! O Exorcista é perfeito para você - possessão demoníaca, atmosfera opressiva e momentos inesquecíveis. Um dos filmes mais assustadores já feitos.",
+                    alternativas: ["Invocação do Mal", "A Bruxa", "Hereditário"]
+                },
+                slasher: {
+                    filme: "Halloween (1978)",
+                    poster: "https://m.media-amazon.com/images/M/MV5BNzk1OGU2NmMtNTdhZC00NjdlLWE5YTMtZTQ0MGExZTQzOGQyXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_FMjpg_UX1000_.jpg",
+                    descricao: "Você adora a perseguição e tensão dos slashers! Halloween criou o gênero com Michael Myers, o Shape. Assassinatos, suspense e o terror de ser caçado. Puro clássico!",
+                    alternativas: ["Pânico", "Sexta-Feira 13", "A Hora do Pesadelo"]
+                },
+                psicologico: {
+                    filme: "O Iluminado (1980)",
+                    poster: "https://m.media-amazon.com/images/M/MV5BZWFlYmY2MGEtZjVkYS00YzU4LTg0YjQtYzY1ZGE3NTA5NGQxXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_FMjpg_UX1000_.jpg",
+                    descricao: "Você aprecia o terror que mexe com a mente! O Iluminado de Kubrick é uma obra-prima do terror psicológico. Loucura, isolamento e simbolismo profundo. 'All work and no play...'",
+                    alternativas: ["Cisne Negro", "Babadook", "Midsommar"]
+                },
+                criatura: {
+                    filme: "Alien: O 8º Passageiro (1979)",
+                    poster: "https://m.media-amazon.com/images/M/MV5BOGQzZTBjMjQtOTVmMS00NGE5LWEyYmMtOGQ1ZGZjNmRkYjFhXkEyXkFqcGdeQXVyMjUzOTY1NTc@._V1_FMjpg_UX1000_.jpg",
+                    descricao: "Você ama o terror de criaturas! Alien é o terror sci-fi definitivo. O Xenomorfo é implacável, a nave é claustrofóbica, e o medo é constante. No espaço, ninguém pode ouvir você gritar!",
+                    alternativas: ["A Coisa", "O Massacre da Serra Elétrica", "Um Lugar Silencioso"]
+                }
+            }
+        };
+
+        let respostas = {
+            sobrenatural: 0,
+            slasher: 0,
+            psicologico: 0,
+            criatura: 0,
+            classico: 0,
+            moderno: 0
+        };
+        let perguntaAtual = 0;
+
+        function renderPergunta() {
+            const pergunta = quizData.perguntas[perguntaAtual];
+            const container = document.getElementById('quiz-content');
+            
+            container.innerHTML = `
+                <div class="quiz-question">
+                    <h3>Pergunta ${perguntaAtual + 1} de ${quizData.perguntas.length}</h3>
+                    <p class="question-text">${pergunta.pergunta}</p>
+                    <div class="quiz-options">
+                        ${pergunta.opcoes.map((opcao, index) => `
+                            <button class="quiz-option" data-index="${index}">
+                                ${opcao.texto}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Atualiza barra de progresso
+            const progress = ((perguntaAtual) / quizData.perguntas.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+
+            // Event listeners
+            document.querySelectorAll('.quiz-option').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = parseInt(btn.getAttribute('data-index'));
+                    responder(index);
+                });
+            });
+        }
+
+        function responder(opcaoIndex) {
+            const pergunta = quizData.perguntas[perguntaAtual];
+            const opcao = pergunta.opcoes[opcaoIndex];
+
+            // Adiciona pontos
+            Object.keys(opcao.pontos).forEach(categoria => {
+                respostas[categoria] += opcao.pontos[categoria];
+            });
+
+            perguntaAtual++;
+
+            if (perguntaAtual < quizData.perguntas.length) {
+                renderPergunta();
+            } else {
+                mostrarResultado();
+            }
+        }
+
+        function mostrarResultado() {
+            // Determina categoria vencedora
+            const categorias = ['sobrenatural', 'slasher', 'psicologico', 'criatura'];
+            let categoriaVencedora = categorias[0];
+            let maiorPontuacao = respostas[categorias[0]];
+
+            categorias.forEach(cat => {
+                if (respostas[cat] > maiorPontuacao) {
+                    maiorPontuacao = respostas[cat];
+                    categoriaVencedora = cat;
+                }
+            });
+
+            const resultado = quizData.resultados[categoriaVencedora];
+            const container = document.getElementById('quiz-resultado');
+            
+            document.getElementById('quiz-content').style.display = 'none';
+            container.style.display = 'block';
+            document.getElementById('progress-bar').style.width = '100%';
+
+            container.innerHTML = `
+                <div class="quiz-resultado-card">
+                    <h3>🎬 Seu Filme Perfeito:</h3>
+                    <div class="resultado-filme">
+                        <img src="${resultado.poster}" alt="${resultado.filme}" style="max-width: 300px; border-radius: 10px; box-shadow: 0 8px 25px rgba(0, 255, 0, 0.3);">
+                        <div class="resultado-info">
+                            <h2 style="color: #00ff00; margin: 20px 0;">${resultado.filme}</h2>
+                            <p style="font-size: 1.1rem; line-height: 1.8;">${resultado.descricao}</p>
+                            <h4 style="color: #00ffff; margin-top: 20px;">Outras recomendações:</h4>
+                            <ul style="color: #d0d0d0; font-size: 1.05rem;">
+                                ${resultado.alternativas.map(alt => `<li>${alt}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="quiz-actions">
+                        <button onclick="refazerQuiz()" class="btn-refazer">🔄 Refazer Quiz</button>
+                        <button onclick="compartilhar()" class="btn-compartilhar">📤 Compartilhar Resultado</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function refazerQuiz() {
+            respostas = {
+                sobrenatural: 0,
+                slasher: 0,
+                psicologico: 0,
+                criatura: 0,
+                classico: 0,
+                moderno: 0
+            };
+            perguntaAtual = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('quiz-resultado').style.display = 'none';
+            renderPergunta();
+        }
+
+        function compartilhar() {
+            const texto = 'Descobri qual filme de terror devo assistir no HallowTales! Faça o quiz você também! 🎃👻';
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Quiz de Terror - HallowTales',
+                    text: texto,
+                    url: window.location.href
+                });
+            } else {
+                alert('Compartilhe este resultado com seus amigos! 👻');
+            }
+        }
+
+        // Inicializa quiz
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPergunta();
+        });
+    </script>
+</body>
+</html>

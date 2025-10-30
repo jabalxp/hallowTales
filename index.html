@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HallowTales</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>HallowTales</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">🏠 Início</a></li>
+                <li><a href="livros.html">📚 Livros</a></li>
+                <li><a href="cidades.html">🏛️ Cidades</a></li>
+                <li><a href="filmes.html">🎬 Filmes & Séries</a></li>
+                <li><a href="jogos.html">🎮 Jogos</a></li>
+                <li><a href="quiz.html">❓ Quiz</a></li>
+                <li><a href="favoritos.html">❤️ Favoritos</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="inicio">
+            <div class="halloween-banner">
+                <h2>🎃Bem-vindo ao HallowTale🎃</h2>
+                <p class="subtitle">Especial Halloween 2025</p>
+            </div>
+            <p>Este é um lugar para os amantes de histórias de terror e mistérios urbanos. Explore lendas assustadoras de cidades ao redor do mundo e mergulhe nos resumos dos livros de terror mais aclamados.</p>
+            <p><strong>Prepare-se para não dormir à noite.</strong></p>
+            
+            <div class="apresentacao">
+                <div class="intro-card">
+                    <h3>📚 Livros de Terror</h3>
+                    <p>Descubra os 10 livros de terror mais vendidos de todos os tempos. Leia resumos detalhados das obras que definiram o gênero e aterrorizaram gerações.</p>
+                    <a href="livros.html" class="btn-navegacao">Explorar Livros</a>
+                </div>
+                
+                <div class="intro-card">
+                    <h3>🏛️ Cidades Assombradas</h3>
+                    <p>Viaje por cidades ao redor do mundo e conheça suas histórias reais, lendas de terror e fatos curiosos que vão arrepiar sua espinha.</p>
+                    <a href="cidades.html" class="btn-navegacao">Visitar Cidades</a>
+                </div>
+
+                <div class="intro-card">
+                    <h3>🎬 Filmes & Séries</h3>
+                    <p>Explore uma coleção completa de filmes e séries de terror. Dos clássicos que definiram o gênero aos modernos que renovaram o medo.</p>
+                    <a href="filmes.html" class="btn-navegacao">Ver Filmes & Séries</a>
+                </div>
+
+                <div class="intro-card">
+                    <h3>🎮 Jogos de Terror</h3>
+                    <p>Os jogos que vão fazer você ter medo de jogar sozinho no escuro. Survival horror, terror psicológico e muito mais.</p>
+                    <a href="jogos.html" class="btn-navegacao">Explorar Jogos</a>
+                </div>
+
+                <div class="intro-card">
+                    <h3>❓ Quiz de Terror</h3>
+                    <p>Descubra qual filme de terror você deveria assistir! Responda às perguntas e receba uma recomendação personalizada.</p>
+                    <a href="quiz.html" class="btn-navegacao">Fazer Quiz</a>
+                </div>
+
+                <div class="intro-card">
+                    <h3>❤️ Meus Favoritos</h3>
+                    <p>Salve seus filmes, séries, jogos e livros favoritos em um só lugar. Crie sua coleção pessoal de terror!</p>
+                    <a href="favoritos.html" class="btn-navegacao">Ver Favoritos</a>
+                </div>
+            </div>
+            
+            <div class="aviso">
+                <p>⚠️ <em>Atenção: O conteúdo deste site pode conter descrições de terror intenso. Recomendado para maiores de 16 anos.</em></p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-decoration">🕷️ 🕸️ 🦇 🎃 🦇 🕸️ 🕷️</div>
+        <p>&copy; 2025 HallowTales. Todos os direitos reservados.</p>
+        <p class="footer-message">👻 Feliz Halloween! Que seus pesadelos sejam aterrorizantes! 👻</p>
+    </footer>
+    <script src="js/script.js"></script>
+    
+    <!-- Adicionar elementos flutuantes de Halloween -->
+    <script>
+        // Cria fantasmas flutuantes
+        function criarFantasmas() {
+            const fantasmas = ['👻', '🦇', '🕷️'];
+            for (let i = 0; i < 5; i++) {
+                const ghost = document.createElement('div');
+                ghost.className = 'ghost-float';
+                ghost.textContent = fantasmas[Math.floor(Math.random() * fantasmas.length)];
+                ghost.style.left = Math.random() * 100 + '%';
+                ghost.style.animationDelay = Math.random() * 10 + 's';
+                ghost.style.animationDuration = (15 + Math.random() * 10) + 's';
+                document.body.appendChild(ghost);
+            }
+        }
+
+        // Cria olhos piscando
+        function criarOlhos() {
+            for (let i = 0; i < 3; i++) {
+                const eyes = document.createElement('div');
+                eyes.className = 'spooky-eyes';
+                eyes.textContent = '👀';
+                eyes.style.left = Math.random() * 90 + '%';
+                eyes.style.top = Math.random() * 80 + '%';
+                eyes.style.animationDelay = Math.random() * 5 + 's';
+                document.body.appendChild(eyes);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            criarFantasmas();
+            criarOlhos();
+        });
+    </script>
+</body>
+</html>
+                <h2>🎬 Filmes Clássicos de Halloween</h2>
+                <p class="secao-descricao">Os filmes old school que definiram o gênero de terror e continuam assustando gerações</p>
+                <div class="filmes-grid">
+                    <div class="filme-card">
+                        <div class="filme-numero">1</div>
+                        <h4>Halloween (1978)</h4>
+                        <p><strong>Diretor:</strong> John Carpenter</p>
+                        <p>O filme que definiu o slasher moderno. Michael Myers escapa de um hospital psiquiátrico e retorna à sua cidade natal para aterrorizar adolescentes na noite de Halloween.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">2</div>
+                        <h4>A Noite dos Mortos-Vivos (1968)</h4>
+                        <p><strong>Diretor:</strong> George A. Romero</p>
+                        <p>O filme que revolucionou o gênero de zumbis. Um grupo de pessoas se refugia em uma casa rural enquanto mortos-vivos caminham pela Terra.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">3</div>
+                        <h4>O Massacre da Serra Elétrica (1974)</h4>
+                        <p><strong>Diretor:</strong> Tobe Hooper</p>
+                        <p>Um dos filmes mais perturbadores já feitos. Jovens em uma viagem encontram uma família de canibais no Texas, liderada pelo icônico Leatherface.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">4</div>
+                        <h4>Psicose (1960)</h4>
+                        <p><strong>Diretor:</strong> Alfred Hitchcock</p>
+                        <p>Uma obra-prima do suspense. Marion Crane rouba dinheiro e para no Motel Bates, onde conhece o perturbador Norman Bates e sua mãe.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">5</div>
+                        <h4>A Hora do Pesadelo (1984)</h4>
+                        <p><strong>Diretor:</strong> Wes Craven</p>
+                        <p>Freddy Krueger ataca adolescentes em seus sonhos. Se você morre no sonho, morre na vida real. Um dos vilões mais icônicos do cinema.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">6</div>
+                        <h4>Sexta-Feira 13 (1980)</h4>
+                        <p><strong>Diretor:</strong> Sean S. Cunningham</p>
+                        <p>Conselheiros de um acampamento de verão são assassinados um por um. O nascimento do icônico Jason Voorhees e sua máscara de hóquei.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">7</div>
+                        <h4>O Exorcista (1973)</h4>
+                        <p><strong>Diretor:</strong> William Friedkin</p>
+                        <p>Considerado um dos filmes mais assustadores já feitos. Uma menina é possuída por um demônio e dois padres tentam salvá-la através de um exorcismo.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">8</div>
+                        <h4>Carrie, a Estranha (1976)</h4>
+                        <p><strong>Diretor:</strong> Brian De Palma</p>
+                        <p>Uma adolescente tímida com poderes telecinéticos é humilhada no baile de formatura e usa seus poderes para uma vingança sangrenta.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">9</div>
+                        <h4>Poltergeist (1982)</h4>
+                        <p><strong>Diretor:</strong> Tobe Hooper</p>
+                        <p>Uma família é aterrorizada por espíritos malignos que sequestram sua filha mais nova através da TV estática. "Eles estão aqui..."</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">10</div>
+                        <h4>Rosemary's Baby (1968)</h4>
+                        <p><strong>Diretor:</strong> Roman Polanski</p>
+                        <p>Uma jovem grávida começa a suspeitar que seus vizinhos pertencem a um culto satânico e têm planos sinistros para seu bebê.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção de Recomendações de Filmes de Terror -->
+            <div class="filmes-section">
+                <h2>🎃 Filmes de Terror Recomendados</h2>
+                <p class="secao-descricao">Uma seleção dos melhores filmes de terror de todas as épocas - dos clássicos imortais aos modernos perturbadores</p>
+                <div class="filmes-grid">
+                    <div class="filme-card">
+                        <div class="filme-numero">1</div>
+                        <h4>O Exorcista (1973)</h4>
+                        <p><strong>Diretor:</strong> William Friedkin</p>
+                        <p>Uma menina possuída por uma entidade demoníaca e dois padres que tentam salvá-la. Considerado o filme de terror mais assustador de todos os tempos.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">2</div>
+                        <h4>Corra! (2017)</h4>
+                        <p><strong>Diretor:</strong> Jordan Peele</p>
+                        <p>Um jovem negro visita a família de sua namorada branca e descobre segredos aterrorizantes. Terror social com crítica racial brilhante.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">3</div>
+                        <h4>O Iluminado (1980)</h4>
+                        <p><strong>Diretor:</strong> Stanley Kubrick</p>
+                        <p>Um escritor aceita trabalhar como zelador de um hotel isolado no inverno e enlouquece lentamente. Obra-prima do terror psicológico.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">4</div>
+                        <h4>Hereditário (2018)</h4>
+                        <p><strong>Diretor:</strong> Ari Aster</p>
+                        <p>Uma família assombrada por segredos sombrios e rituais ocultos após a morte da matriarca. Terror psicológico perturbador e devastador.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">5</div>
+                        <h4>Psicose (1960)</h4>
+                        <p><strong>Diretor:</strong> Alfred Hitchcock</p>
+                        <p>Uma secretária em fuga encontra abrigo em um motel isolado gerido por Norman Bates. Revolucionou o gênero de suspense e terror.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">6</div>
+                        <h4>A Bruxa de Blair (1999)</h4>
+                        <p><strong>Diretor:</strong> Daniel Myrick, Eduardo Sánchez</p>
+                        <p>Três estudantes desaparecem investigando a lenda da Bruxa de Blair. Fundou o gênero found footage e aterrorizou uma geração.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">7</div>
+                        <h4>Invocação do Mal (2013)</h4>
+                        <p><strong>Diretor:</strong> James Wan</p>
+                        <p>Paranormais Ed e Lorraine Warren investigam atividades demoníacas em uma fazenda. Baseado em casos reais, mestria em jump scares.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">8</div>
+                        <h4>Alien: O 8º Passageiro (1979)</h4>
+                        <p><strong>Diretor:</strong> Ridley Scott</p>
+                        <p>A tripulação de uma nave espacial enfrenta uma criatura alienígena mortal. Fusão perfeita de terror e ficção científica.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">9</div>
+                        <h4>A Bruxa (2015)</h4>
+                        <p><strong>Diretor:</strong> Robert Eggers</p>
+                        <p>Na Nova Inglaterra do século XVII, uma família puritana é assombrada por forças sobrenaturais na floresta. Atmosfera opressiva e autêntica.</p>
+                    </div>
+                    <div class="filme-card">
+                        <div class="filme-numero">10</div>
+                        <h4>O Massacre da Serra Elétrica (1974)</h4>
+                        <p><strong>Diretor:</strong> Tobe Hooper</p>
+                        <p>Jovens encontram uma família de canibais no Texas. Brutal, perturbador e influente. Definiu o slasher moderno com Leatherface.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="aviso">
+                <p>⚠️ <em>Atenção: O conteúdo deste site pode conter descrições de terror intenso. Recomendado para maiores de 16 anos.</em></p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-decoration">🕷️ 🕸️ 🦇 🎃 🦇 🕸️ 🕷️</div>
+        <p>&copy; 2025 HallowTales. Todos os direitos reservados.</p>
+        <p class="footer-message">👻 Feliz Halloween! Que seus pesadelos sejam aterrorizantes! 👻</p>
+    </footer>
+    <script src="js/script.js"></script>
+</body>
+</html>

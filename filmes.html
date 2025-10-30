@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmes & Séries de Terror - HallowTales</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>HallowTales</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">🏠 Início</a></li>
+                <li><a href="livros.html">📚 Livros</a></li>
+                <li><a href="cidades.html">🏛️ Cidades</a></li>
+                <li><a href="filmes.html">🎬 Filmes & Séries</a></li>
+                <li><a href="jogos.html">🎮 Jogos</a></li>
+                <li><a href="quiz.html">❓ Quiz</a></li>
+                <li><a href="favoritos.html">❤️ Favoritos</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <!-- Seção de Filmes -->
+        <section id="filmes">
+            <h2>🎬 Filmes de Terror</h2>
+            <p style="text-align: center; color: #00ffff; font-size: 1.1rem; margin-bottom: 20px;">Dos clássicos que definiram o gênero aos modernos que renovaram o terror</p>
+            
+            <!-- Filtros e busca -->
+            <div class="filters-container">
+                <input type="text" id="search-filmes" placeholder="🔍 Buscar filme...">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter-type="all">Todos</button>
+                    <button class="filter-btn" data-filter-type="classico">Clássicos</button>
+                    <button class="filter-btn" data-filter-type="moderno">Modernos</button>
+                    <select id="decade-filter">
+                        <option value="all">Todas as Décadas</option>
+                        <option value="1960s">Anos 60</option>
+                        <option value="1970s">Anos 70</option>
+                        <option value="1980s">Anos 80</option>
+                        <option value="1990s">Anos 90</option>
+                        <option value="2010s">Anos 2010+</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="lista-filmes" class="media-grid">
+                <!-- Os filmes serão inseridos aqui via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Seção de Séries -->
+        <section id="series">
+            <h2>📺 Séries de Terror</h2>
+            <p style="text-align: center; color: #00ffff; font-size: 1.1rem; margin-bottom: 20px;">As melhores séries para maratonar e ter pesadelos por temporadas inteiras</p>
+            
+            <!-- Busca de séries -->
+            <div class="filters-container">
+                <input type="text" id="search-series" placeholder="🔍 Buscar série...">
+                <div class="filter-buttons">
+                    <select id="streaming-filter">
+                        <option value="all">Todas as Plataformas</option>
+                        <option value="Netflix">Netflix</option>
+                        <option value="Disney+">Disney+</option>
+                        <option value="HBO Max">HBO Max</option>
+                        <option value="Prime Video">Prime Video</option>
+                        <option value="Paramount+">Paramount+</option>
+                        <option value="Apple TV+">Apple TV+</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="lista-series" class="media-grid">
+                <!-- As séries serão inseridas aqui via JavaScript -->
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-decoration">🕷️ 🕸️ 🦇 🎃 🦇 🕸️ 🕷️</div>
+        <p>&copy; 2025 HallowTales. Todos os direitos reservados.</p>
+        <p class="footer-message">👻 Feliz Halloween! Que seus pesadelos sejam aterrorizantes! 👻</p>
+    </footer>
+    <script src="js/favoritos.js"></script>
+    <script src="js/api-config.js"></script>
+    <script src="js/api-filmes.js"></script>
+    <script src="js/api-series.js"></script>
+    <script src="js/filmes.js"></script>
+    <script src="js/series.js"></script>
+    <script>
+        // Renderiza filmes
+        function renderFilmes(filmes) {
+            const container = document.getElementById('lista-filmes');
+            container.innerHTML = '';
+
+            if (filmes.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">Nenhum filme encontrado 😢</p>';
+                return;
+            }
+
+            filmes.forEach(filme => {
+                const card = document.createElement('div');
+                card.className = 'media-card';
+                card.setAttribute('data-item-data', JSON.stringify({
+                    titulo: filme.titulo,
+                    ano: filme.ano,
+                    diretor: filme.diretor,
+                    poster: filme.poster
+                }));
+
+                card.innerHTML = `
+                    <div class="media-poster">
+                        <img src="${filme.poster}" alt="${filme.titulo}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x450/1a001a/00ff00?text=${encodeURIComponent(filme.titulo)}'">
+                        <button class="favorite-btn" 
+                                data-favorite-type="filmes" 
+                                data-favorite-id="${filme.id}"
+                                title="Adicionar aos favoritos">
+                            🤍
+                        </button>
+                    </div>
+                    <div class="media-info">
+                        <h3>${filme.titulo}</h3>
+                        <p class="media-year">${filme.ano} • ${filme.diretor}</p>
+                        <p class="media-genre">${filme.genero}</p>
+                        <p class="media-sinopse">${filme.sinopse}</p>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            FavoritesManager.initializeFavoriteButtons();
+        }
+
+        // Renderiza séries
+        function renderSeries(series) {
+            const container = document.getElementById('lista-series');
+            container.innerHTML = '';
+
+            if (series.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">Nenhuma série encontrada 😢</p>';
+                return;
+            }
+
+            series.forEach(serie => {
+                const card = document.createElement('div');
+                card.className = 'media-card';
+                card.setAttribute('data-item-data', JSON.stringify({
+                    titulo: serie.titulo,
+                    ano: serie.ano,
+                    criador: serie.criador,
+                    poster: serie.poster
+                }));
+
+                card.innerHTML = `
+                    <div class="media-poster">
+                        <img src="${serie.poster}" alt="${serie.titulo}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x450/1a001a/00ff00?text=${encodeURIComponent(serie.titulo)}'">
+                        <button class="favorite-btn" 
+                                data-favorite-type="series" 
+                                data-favorite-id="${serie.id}"
+                                title="Adicionar aos favoritos">
+                            🤍
+                        </button>
+                        <span class="streaming-badge">${serie.streaming}</span>
+                    </div>
+                    <div class="media-info">
+                        <h3>${serie.titulo}</h3>
+                        <p class="media-year">${serie.ano} • ${serie.temporadas} temporada${serie.temporadas > 1 ? 's' : ''}</p>
+                        <p class="media-genre">${serie.genero}</p>
+                        <p class="media-sinopse">${serie.sinopse}</p>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            FavoritesManager.initializeFavoriteButtons();
+        }
+
+        // Filtros de filmes
+        let currentFilmesFilter = 'all';
+        let currentDecadeFilter = 'all';
+
+        function applyFilmesFilters() {
+            let filtered = filmesData;
+
+            // Filtro de tipo
+            if (currentFilmesFilter !== 'all') {
+                filtered = filtered.filter(f => f.tipo === currentFilmesFilter);
+            }
+
+            // Filtro de década
+            if (currentDecadeFilter !== 'all') {
+                filtered = filtered.filter(f => f.decada === currentDecadeFilter);
+            }
+
+            // Busca
+            const searchTerm = document.getElementById('search-filmes').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(f => 
+                    f.titulo.toLowerCase().includes(searchTerm) ||
+                    f.diretor.toLowerCase().includes(searchTerm) ||
+                    f.sinopse.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            renderFilmes(filtered);
+        }
+
+        // Filtros de séries
+        let currentStreamingFilter = 'all';
+
+        function applySeriesFilters() {
+            let filtered = seriesData;
+
+            // Filtro de streaming
+            if (currentStreamingFilter !== 'all') {
+                filtered = filtered.filter(s => s.streaming === currentStreamingFilter);
+            }
+
+            // Busca
+            const searchTerm = document.getElementById('search-series').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(s => 
+                    s.titulo.toLowerCase().includes(searchTerm) ||
+                    s.criador.toLowerCase().includes(searchTerm) ||
+                    s.sinopse.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            renderSeries(filtered);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize movies and series from API
+            try {
+                await Promise.all([initializeMovies(), initializeSeries()]);
+                // Renderiza inicial
+                renderFilmes(filmesData);
+                renderSeries(seriesData);
+            } catch (error) {
+                console.error('Error loading movies/series:', error);
+                document.getElementById('lista-filmes').innerHTML = 
+                    '<p style="text-align: center; color: #ff0000; grid-column: 1/-1;">❌ Erro ao carregar filmes. Configure sua chave da API TMDB.</p>';
+                document.getElementById('lista-series').innerHTML = 
+                    '<p style="text-align: center; color: #ff0000; grid-column: 1/-1;">❌ Erro ao carregar séries. Configure sua chave da API TMDB.</p>';
+            }
+
+            // Filtros de filmes
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentFilmesFilter = e.target.getAttribute('data-filter-type');
+                    applyFilmesFilters();
+                });
+            });
+
+            document.getElementById('decade-filter').addEventListener('change', (e) => {
+                currentDecadeFilter = e.target.value;
+                applyFilmesFilters();
+            });
+
+            document.getElementById('search-filmes').addEventListener('input', applyFilmesFilters);
+
+            // Filtros de séries
+            document.getElementById('streaming-filter').addEventListener('change', (e) => {
+                currentStreamingFilter = e.target.value;
+                applySeriesFilters();
+            });
+
+            document.getElementById('search-series').addEventListener('input', applySeriesFilters);
+        });
+    </script>
+</body>
+</html>

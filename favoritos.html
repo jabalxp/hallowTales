@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Favoritos - HallowTales</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>HallowTales</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">🏠 Início</a></li>
+                <li><a href="livros.html">📚 Livros</a></li>
+                <li><a href="cidades.html">🏛️ Cidades</a></li>
+                <li><a href="filmes.html">🎬 Filmes & Séries</a></li>
+                <li><a href="jogos.html">🎮 Jogos</a></li>
+                <li><a href="quiz.html">❓ Quiz</a></li>
+                <li><a href="favoritos.html">❤️ Favoritos</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="favoritos">
+            <h2>❤️ Meus Favoritos</h2>
+            <p style="text-align: center; color: #00ffff; font-size: 1.1rem; margin-bottom: 30px;">
+                Sua coleção pessoal de terror
+            </p>
+
+            <div id="favoritos-stats" class="favoritos-stats">
+                <!-- Estatísticas serão inseridas aqui -->
+            </div>
+
+            <!-- Filmes -->
+            <div class="favoritos-section">
+                <h3>🎬 Filmes (<span id="count-filmes">0</span>)</h3>
+                <div id="favoritos-filmes" class="media-grid">
+                    <!-- Filmes favoritos aqui -->
+                </div>
+            </div>
+
+            <!-- Séries -->
+            <div class="favoritos-section">
+                <h3>📺 Séries (<span id="count-series">0</span>)</h3>
+                <div id="favoritos-series" class="media-grid">
+                    <!-- Séries favoritas aqui -->
+                </div>
+            </div>
+
+            <!-- Jogos -->
+            <div class="favoritos-section">
+                <h3>🎮 Jogos (<span id="count-jogos">0</span>)</h3>
+                <div id="favoritos-jogos" class="media-grid">
+                    <!-- Jogos favoritos aqui -->
+                </div>
+            </div>
+
+            <!-- Livros -->
+            <div class="favoritos-section">
+                <h3>📚 Livros (<span id="count-livros">0</span>)</h3>
+                <div id="favoritos-livros" class="lista-simples">
+                    <!-- Livros favoritos aqui -->
+                </div>
+            </div>
+
+            <!-- Cidades -->
+            <div class="favoritos-section">
+                <h3>🏛️ Cidades (<span id="count-cidades">0</span>)</h3>
+                <div id="favoritos-cidades" class="lista-simples">
+                    <!-- Cidades favoritas aqui -->
+                </div>
+            </div>
+
+            <div class="favoritos-actions">
+                <button onclick="FavoritesManager.exportFavorites()" class="btn-export">
+                    📥 Exportar Favoritos
+                </button>
+                <button onclick="limparTodosFavoritos()" class="btn-clear">
+                    🗑️ Limpar Todos
+                </button>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-decoration">🕷️ 🕸️ 🦇 🎃 🦇 🕸️ 🕷️</div>
+        <p>&copy; 2025 HallowTales. Todos os direitos reservados.</p>
+        <p class="footer-message">👻 Feliz Halloween! Que seus pesadelos sejam aterrorizantes! 👻</p>
+    </footer>
+    <script src="js/favoritos.js"></script>
+    <script>
+        function renderFavoritos() {
+            const favorites = FavoritesManager.getAll();
+            let totalCount = 0;
+
+            // Estatísticas
+            const statsHtml = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number">${favorites.filmes.length}</span>
+                        <span class="stat-label">Filmes</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">${favorites.series.length}</span>
+                        <span class="stat-label">Séries</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">${favorites.jogos.length}</span>
+                        <span class="stat-label">Jogos</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">${favorites.livros.length}</span>
+                        <span class="stat-label">Livros</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">${favorites.cidades.length}</span>
+                        <span class="stat-label">Cidades</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('favoritos-stats').innerHTML = statsHtml;
+
+            // Atualiza contadores
+            document.getElementById('count-filmes').textContent = favorites.filmes.length;
+            document.getElementById('count-series').textContent = favorites.series.length;
+            document.getElementById('count-jogos').textContent = favorites.jogos.length;
+            document.getElementById('count-livros').textContent = favorites.livros.length;
+            document.getElementById('count-cidades').textContent = favorites.cidades.length;
+
+            // Renderiza Filmes
+            const filmesContainer = document.getElementById('favoritos-filmes');
+            if (favorites.filmes.length === 0) {
+                filmesContainer.innerHTML = '<p class="empty-message">Nenhum filme favoritado ainda 😢</p>';
+            } else {
+                filmesContainer.innerHTML = favorites.filmes.map(fav => `
+                    <div class="media-card" data-item-data='${JSON.stringify(fav)}'>
+                        <div class="media-poster">
+                            <img src="${fav.poster || 'https://via.placeholder.com/300x450/1a001a/00ff00?text=Filme'}" 
+                                 alt="${fav.titulo}" 
+                                 loading="lazy">
+                            <button class="favorite-btn favorited" 
+                                    data-favorite-type="filmes" 
+                                    data-favorite-id="${fav.id}">
+                                ❤️
+                            </button>
+                        </div>
+                        <div class="media-info">
+                            <h3>${fav.titulo}</h3>
+                            <p class="media-year">${fav.ano || ''}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Renderiza Séries
+            const seriesContainer = document.getElementById('favoritos-series');
+            if (favorites.series.length === 0) {
+                seriesContainer.innerHTML = '<p class="empty-message">Nenhuma série favoritada ainda 😢</p>';
+            } else {
+                seriesContainer.innerHTML = favorites.series.map(fav => `
+                    <div class="media-card" data-item-data='${JSON.stringify(fav)}'>
+                        <div class="media-poster">
+                            <img src="${fav.poster || 'https://via.placeholder.com/300x450/1a001a/00ff00?text=Serie'}" 
+                                 alt="${fav.titulo}" 
+                                 loading="lazy">
+                            <button class="favorite-btn favorited" 
+                                    data-favorite-type="series" 
+                                    data-favorite-id="${fav.id}">
+                                ❤️
+                            </button>
+                        </div>
+                        <div class="media-info">
+                            <h3>${fav.titulo}</h3>
+                            <p class="media-year">${fav.ano || ''}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Renderiza Jogos
+            const jogosContainer = document.getElementById('favoritos-jogos');
+            if (favorites.jogos.length === 0) {
+                jogosContainer.innerHTML = '<p class="empty-message">Nenhum jogo favoritado ainda 😢</p>';
+            } else {
+                jogosContainer.innerHTML = favorites.jogos.map(fav => `
+                    <div class="media-card" data-item-data='${JSON.stringify(fav)}'>
+                        <div class="media-poster">
+                            <img src="${fav.poster || 'https://via.placeholder.com/300x450/1a001a/00ff00?text=Jogo'}" 
+                                 alt="${fav.titulo}" 
+                                 loading="lazy">
+                            <button class="favorite-btn favorited" 
+                                    data-favorite-type="jogos" 
+                                    data-favorite-id="${fav.id}">
+                                ❤️
+                            </button>
+                        </div>
+                        <div class="media-info">
+                            <h3>${fav.titulo}</h3>
+                            <p class="media-year">${fav.ano || ''}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Renderiza Livros
+            const livrosContainer = document.getElementById('favoritos-livros');
+            if (favorites.livros.length === 0) {
+                livrosContainer.innerHTML = '<p class="empty-message">Nenhum livro favoritado ainda 😢</p>';
+            } else {
+                livrosContainer.innerHTML = favorites.livros.map(fav => `
+                    <div class="favorito-item">
+                        <span class="favorito-titulo">📖 ${fav.titulo || fav.id}</span>
+                        <button class="favorite-btn favorited small" 
+                                data-favorite-type="livros" 
+                                data-favorite-id="${fav.id}">
+                            ❤️
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            // Renderiza Cidades
+            const cidadesContainer = document.getElementById('favoritos-cidades');
+            if (favorites.cidades.length === 0) {
+                cidadesContainer.innerHTML = '<p class="empty-message">Nenhuma cidade favoritada ainda 😢</p>';
+            } else {
+                cidadesContainer.innerHTML = favorites.cidades.map(fav => `
+                    <div class="favorito-item">
+                        <span class="favorito-titulo">🏛️ ${fav.titulo || fav.id}</span>
+                        <button class="favorite-btn favorited small" 
+                                data-favorite-type="cidades" 
+                                data-favorite-id="${fav.id}">
+                            ❤️
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            // Reinicializa os botões
+            FavoritesManager.initializeFavoriteButtons();
+
+            // Adiciona listener para atualizar quando favorito mudar
+            setTimeout(() => {
+                document.querySelectorAll('.favorite-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        setTimeout(() => renderFavoritos(), 100);
+                    });
+                });
+            }, 100);
+        }
+
+        function limparTodosFavoritos() {
+            if (confirm('Tem certeza que deseja remover TODOS os favoritos? Esta ação não pode ser desfeita! 😱')) {
+                localStorage.setItem('hallowtales_favorites', JSON.stringify({
+                    filmes: [],
+                    series: [],
+                    livros: [],
+                    jogos: [],
+                    cidades: []
+                }));
+                renderFavoritos();
+                FavoritesManager.showNotification('Todos os favoritos foram removidos! 💔');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFavoritos();
+        });
+    </script>
+</body>
+</html>
