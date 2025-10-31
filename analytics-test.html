@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste do Vercel Analytics - HallowTales</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        .container {
+            background: #0a0a0a;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #ff4444;
+            text-shadow: 0 0 10px #ff4444;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #00ff00;
+        }
+        .success {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: #00ff00;
+        }
+        .warning {
+            background: rgba(255, 165, 0, 0.1);
+            border-color: #ffa500;
+            color: #ffa500;
+        }
+        button {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #ff6666;
+            box-shadow: 0 0 15px rgba(255, 68, 68, 0.5);
+        }
+        .console {
+            background: #000;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .log {
+            margin: 5px 0;
+            padding: 5px;
+        }
+        .log.success {
+            color: #00ff00;
+        }
+        .log.info {
+            color: #00ffff;
+        }
+        .log.event {
+            color: #ffff00;
+        }
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+    <!-- Vercel Analytics -->
+    <script src="js/analytics.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🎃 Teste do Vercel Analytics</h1>
+        
+        <div class="status success">
+            <strong>✅ Status:</strong> Analytics carregado com sucesso!
+        </div>
+        
+        <div class="status warning">
+            <strong>⚠️ Atenção:</strong> Em localhost, o script do Vercel não carrega (é esperado).
+            <br>Os eventos são logados no console para teste.
+            <br>Para funcionar completamente, faça deploy no Vercel.
+        </div>
+        
+        <h2>📊 Funções Disponíveis:</h2>
+        
+        <div class="status">
+            <code>window.trackEvent(name, data)</code> - Rastrear evento personalizado
+            <br><br>
+            <code>window.va</code> - Função de analytics do Vercel (quando em produção)
+        </div>
+        
+        <h2>🧪 Testar Eventos:</h2>
+        
+        <button onclick="testPageView()">📄 Page View</button>
+        <button onclick="testCustomEvent()">🎯 Custom Event</button>
+        <button onclick="testFavorite()">❤️ Favorite Added</button>
+        <button onclick="testQuiz()">❓ Quiz Completed</button>
+        <button onclick="testSearch()">🔍 Search</button>
+        <button onclick="clearConsole()">🗑️ Limpar Console</button>
+        
+        <div class="console" id="console">
+            <div class="log info">📊 Console de Analytics - Pronto para testes</div>
+            <div class="log info">💡 Clique nos botões acima para testar eventos</div>
+        </div>
+        
+        <h2>📚 Documentação:</h2>
+        <ul>
+            <li><a href="VERCEL_ANALYTICS_GUIDE.md" target="_blank" style="color: #00ffff;">Guia de Analytics</a></li>
+            <li><a href="VERCEL_DEPLOY_GUIDE.md" target="_blank" style="color: #00ffff;">Guia de Deploy</a></li>
+            <li><a href="INSTALLATION_SUMMARY.md" target="_blank" style="color: #00ffff;">Resumo da Instalação</a></li>
+        </ul>
+        
+        <h2>🚀 Próximos Passos:</h2>
+        <ol>
+            <li>Fazer commit das mudanças: <code>git add . && git commit -m "Add Vercel Analytics"</code></li>
+            <li>Push para GitHub: <code>git push origin main</code></li>
+            <li>Deploy no Vercel: <code>vercel --prod</code></li>
+            <li>Ativar Analytics no dashboard do Vercel</li>
+            <li>Acessar o site em produção e ver os dados!</li>
+        </ol>
+    </div>
+    
+    <script>
+        const consoleEl = document.getElementById('console');
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleEl.appendChild(div);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+        
+        function testPageView() {
+            log('📄 Page view detectado automaticamente', 'success');
+            log('Vercel Analytics rastreia page views automaticamente', 'info');
+        }
+        
+        function testCustomEvent() {
+            trackEvent('Test Custom Event', { 
+                timestamp: new Date().toISOString(),
+                testNumber: Math.floor(Math.random() * 100)
+            });
+            log('🎯 Custom Event disparado: Test Custom Event', 'event');
+        }
+        
+        function testFavorite() {
+            trackEvent('Favorite Added', { 
+                type: 'livros',
+                itemId: 'it-stephen-king',
+                itemTitle: 'It - A Coisa'
+            });
+            log('❤️ Favorite Added disparado', 'event');
+            log('Dados: { type: livros, itemTitle: "It - A Coisa" }', 'info');
+        }
+        
+        function testQuiz() {
+            trackEvent('Quiz Completed', { 
+                result: 'The Conjuring',
+                score: 8,
+                timeSpent: 120
+            });
+            log('❓ Quiz Completed disparado', 'event');
+            log('Dados: { result: "The Conjuring", score: 8 }', 'info');
+        }
+        
+        function testSearch() {
+            trackEvent('Book Search', { 
+                query: 'Stephen King',
+                resultsCount: 15
+            });
+            log('🔍 Book Search disparado', 'event');
+            log('Dados: { query: "Stephen King", resultsCount: 15 }', 'info');
+        }
+        
+        function clearConsole() {
+            consoleEl.innerHTML = '<div class="log info">📊 Console limpo</div>';
+        }
+        
+        // Log inicial
+        setTimeout(() => {
+            if (typeof window.trackEvent === 'function') {
+                log('✅ window.trackEvent está disponível', 'success');
+            } else {
+                log('❌ window.trackEvent não encontrado', 'error');
+            }
+            
+            if (typeof window.va === 'function') {
+                log('✅ window.va está disponível', 'success');
+            } else {
+                log('⚠️ window.va não encontrado (normal em localhost)', 'warning');
+            }
+        }, 500);
+        
+        // Interceptar console.log para mostrar na tela
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            if (args[0] && args[0].includes('📊')) {
+                log(args.join(' '), 'event');
+            }
+        };
+    </script>
+</body>
+</html>
