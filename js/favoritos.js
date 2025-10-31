@@ -11,8 +11,7 @@ const FavoritesManager = {
                 filmes: [],
                 series: [],
                 livros: [],
-                jogos: [],
-                cidades: []
+                jogos: []
             }));
         }
     },
@@ -31,24 +30,50 @@ const FavoritesManager = {
 
     // Adiciona aos favoritos
     addToFavorites(type, id, data = {}) {
+        console.log('➕ addToFavorites chamado:', { type, id, data });
         const favorites = this.getAll();
         if (!favorites[type].find(item => item.id === id)) {
-            favorites[type].push({ id, ...data, addedAt: new Date().toISOString() });
+            const itemToAdd = { id, ...data, addedAt: new Date().toISOString() };
+            console.log('💾 Adicionando item:', itemToAdd);
+            favorites[type].push(itemToAdd);
             localStorage.setItem(this.storageKey, JSON.stringify(favorites));
             this.updateFavoriteButtons(type, id, true);
             this.showNotification(`Adicionado aos favoritos! ❤️`);
+            console.log('✅ Item adicionado com sucesso!');
+            
+            // Track event in Vercel Analytics
+            if (typeof window.trackEvent === 'function') {
+                window.trackEvent('Favorite Added', { 
+                    type: type, 
+                    itemId: id,
+                    itemTitle: data.titulo || data.title || 'Unknown'
+                });
+            }
+            
             return true;
         }
+        console.log('⚠️ Item já existe nos favoritos');
         return false;
     },
 
     // Remove dos favoritos
     removeFromFavorites(type, id) {
         const favorites = this.getAll();
+        const removedItem = favorites[type].find(item => item.id === id);
         favorites[type] = favorites[type].filter(item => item.id !== id);
         localStorage.setItem(this.storageKey, JSON.stringify(favorites));
         this.updateFavoriteButtons(type, id, false);
         this.showNotification(`Removido dos favoritos! 💔`);
+        
+        // Track event in Vercel Analytics
+        if (typeof window.trackEvent === 'function' && removedItem) {
+            window.trackEvent('Favorite Removed', { 
+                type: type, 
+                itemId: id,
+                itemTitle: removedItem.titulo || removedItem.title || 'Unknown'
+            });
+        }
+        
         return true;
     },
 
@@ -60,10 +85,16 @@ const FavoritesManager = {
 
     // Toggle favorito
     toggleFavorite(type, id, data = {}) {
-        if (this.isFavorite(type, id)) {
+        console.log('🔄 toggleFavorite chamado:', { type, id, data });
+        const isFav = this.isFavorite(type, id);
+        console.log('É favorito?', isFav);
+        
+        if (isFav) {
+            console.log('➖ Removendo dos favoritos...');
             this.removeFromFavorites(type, id);
             return false;
         } else {
+            console.log('➕ Adicionando aos favoritos...');
             this.addToFavorites(type, id, data);
             return true;
         }
@@ -103,23 +134,53 @@ const FavoritesManager = {
                 btn.title = 'Adicionar aos favoritos';
             }
 
-            btn.addEventListener('click', (e) => {
+            // Remove event listeners antigos (se houver)
+            if (btn._favoriteClickHandler) {
+                btn.removeEventListener('click', btn._favoriteClickHandler);
+            }
+
+            // Cria novo handler e guarda referência
+            btn._favoriteClickHandler = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Pega os dados do card
-                const card = btn.closest('[data-item-data]');
+                console.log('🔍 Botão favorito clicado!');
+                console.log('Type:', type, 'ID:', id);
+                
+                // Pega os dados do button ou do card
                 let itemData = {};
-                if (card) {
+                
+                // Primeiro tenta pegar do próprio botão (para livros)
+                if (btn.hasAttribute('data-favorite-data')) {
                     try {
-                        itemData = JSON.parse(card.getAttribute('data-item-data'));
-                    } catch (e) {
-                        console.error('Erro ao parsear dados do item:', e);
+                        const dataStr = btn.getAttribute('data-favorite-data');
+                        console.log('📝 Dados encontrados no botão:', dataStr);
+                        itemData = JSON.parse(dataStr);
+                        console.log('✅ Dados parseados:', itemData);
+                    } catch (err) {
+                        console.error('❌ Erro ao parsear dados do botão:', err);
+                    }
+                }
+                // Se não encontrou no botão, tenta pegar do card pai
+                else {
+                    const card = btn.closest('[data-item-data]');
+                    if (card) {
+                        try {
+                            itemData = JSON.parse(card.getAttribute('data-item-data'));
+                            console.log('✅ Dados encontrados no card pai:', itemData);
+                        } catch (err) {
+                            console.error('❌ Erro ao parsear dados do item:', err);
+                        }
+                    } else {
+                        console.log('⚠️ Nenhum dado encontrado (nem no botão, nem no card pai)');
                     }
                 }
                 
+                console.log('🚀 Chamando toggleFavorite com:', { type, id, itemData });
                 this.toggleFavorite(type, id, itemData);
-            });
+            };
+
+            btn.addEventListener('click', btn._favoriteClickHandler);
         });
     },
 

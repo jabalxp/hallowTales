@@ -1,0 +1,15 @@
+{
+  "name": "testeia-main",
+  "version": "1.0.0",
+  "description": "Um site completo dedicado aos amantes de histórias de terror, mistérios urbanos e lendas assustadoras.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/analytics": "^1.5.0"
+  }
+}

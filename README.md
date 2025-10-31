@@ -103,16 +103,71 @@ O site é totalmente responsivo e se adapta a diferentes tamanhos de tela:
 - Tablet (768px - 1199px)
 - Mobile (até 767px)
 
-## 🔮 Funcionalidades Futuras (Sugestões)
+## � Analytics & Tracking
 
-- [ ] Adicionar mais cidades e livros
-- [ ] Sistema de favoritos
+### Vercel Analytics Instalado ✅
+
+O projeto está configurado com **Vercel Analytics** para rastrear:
+- 📈 Visualizações de página
+- 👥 Visitantes únicos
+- 🌍 Localização geográfica
+- 📱 Tipos de dispositivos
+- 🎯 Eventos personalizados (favoritos, quiz, etc.)
+
+#### Quick Start:
+
+```bash
+# 1. Instalar dependências
+npm install
+
+# 2. Deploy no Vercel
+npm i -g vercel
+vercel --prod
+
+# 3. Ativar Analytics no dashboard
+# Settings > Analytics > Enable Web Analytics
+```
+
+📚 **Documentação completa:**
+- [VERCEL_ANALYTICS_GUIDE.md](VERCEL_ANALYTICS_GUIDE.md) - Como usar analytics
+- [VERCEL_DEPLOY_GUIDE.md](VERCEL_DEPLOY_GUIDE.md) - Como fazer deploy
+- [INSTALLATION_SUMMARY.md](INSTALLATION_SUMMARY.md) - Resumo da instalação
+
+## 🔮 Funcionalidades Implementadas
+
+- [x] Sistema de favoritos com localStorage
+- [x] Integração com TMDB API (filmes e séries)
+- [x] Integração com Open Library API (livros)
+- [x] Quiz interativo de filmes de terror
+- [x] Pesquisa em tempo real
+- [x] Design moderno com Shadcn-UI e Tailwind CSS
+- [x] Analytics com Vercel Analytics
+- [x] Rastreamento de eventos personalizados
 - [ ] Modo claro/escuro
 - [ ] Compartilhamento em redes sociais
-- [ ] Seção de comentários
-- [ ] Galeria de imagens
-- [ ] Áudio ambiente de terror
+- [ ] Sistema de comentários
+- [ ] PWA (Progressive Web App)
+
+## 🚀 Deploy
+
+### Vercel (Recomendado)
+
+```bash
+# Via Vercel CLI
+vercel --prod
+```
+
+Ou conecte seu repositório GitHub diretamente no [Vercel Dashboard](https://vercel.com/dashboard).
+
+### Outras Plataformas
+
+O projeto é 100% estático e pode ser hospedado em:
+- GitHub Pages
+- Netlify
+- Cloudflare Pages
+- Firebase Hosting
 
 ---
 
 **Desenvolvido com ❤️ e 💀 para os amantes de terror**
+**Com 📊 analytics by Vercel**

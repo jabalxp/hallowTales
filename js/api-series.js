@@ -6,7 +6,47 @@ let seriesCache = null;
 let seriesCacheTimestamp = null;
 const SERIES_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-// Fetch horror series from TMDB API
+// Streaming provider IDs for TMDB API
+const STREAMING_PROVIDERS = {
+    NETFLIX: 8,
+    DISNEY_PLUS: 337,
+    PARAMOUNT_PLUS: 531,
+    APPLE_TV: 350,
+    PRIME_VIDEO: 119,
+    HBO_MAX: 384
+};
+
+// Fetch series from a specific streaming provider
+async function fetchSeriesByProvider(providerId, providerName, maxResults = 10) {
+    try {
+        const url = buildApiUrl(API_CONFIG.TMDB.BASE_URL, '/discover/tv', {
+            api_key: API_CONFIG.TMDB.API_KEY,
+            with_genres: '10765,9648', // Sci-Fi & Fantasy, Mystery
+            with_keywords: '9663|4458|9951|180547', // horror, supernatural, gore, survival horror
+            with_watch_providers: providerId,
+            watch_region: 'US', // Can be changed to BR for Brazil
+            sort_by: 'popularity.desc',
+            'vote_count.gte': 50,
+            page: 1,
+            language: 'pt-BR'
+        });
+        
+        const result = await apiFetch(url);
+        const series = result.results || [];
+        
+        console.log(`Fetched ${series.length} series from ${providerName}`);
+        
+        return series.slice(0, maxResults).map(s => ({
+            ...s,
+            streaming_provider: providerName
+        }));
+    } catch (error) {
+        console.error(`Error fetching series from ${providerName}:`, error);
+        return [];
+    }
+}
+
+// Fetch horror series from TMDB API with specific streaming providers
 async function fetchHorrorSeries() {
     // Check if API key is configured
     if (!API_CONFIG.TMDB.API_KEY || API_CONFIG.TMDB.API_KEY === 'YOUR_TMDB_API_KEY_HERE') {
@@ -15,7 +55,7 @@ async function fetchHorrorSeries() {
     }
 
     // Check cache first
-    if (seriesCache && seriesCacheTimestamp && (Date.now() - seriesCacheTimestamp) < CACHE_DURATION) {
+    if (seriesCache && seriesCacheTimestamp && (Date.now() - seriesCacheTimestamp) < SERIES_CACHE_DURATION) {
         console.log('Returning series from cache');
         return seriesCache;
     }
@@ -23,55 +63,51 @@ async function fetchHorrorSeries() {
     try {
         console.log('Fetching horror series from TMDB API...');
         
-        // Mystery & Sci-Fi Fantasy genres also work well for horror series
-        // 10759 = Action & Adventure, 9648 = Mystery, 10765 = Sci-Fi & Fantasy
-        const horrorGenres = '10765,9648';
-        
-        // Fetch multiple pages to get more series
-        const promises = [];
-        for (let page = 1; page <= 2; page++) {
-            const url = buildApiUrl(API_CONFIG.TMDB.BASE_URL, '/discover/tv', {
-                api_key: API_CONFIG.TMDB.API_KEY,
-                with_genres: horrorGenres,
-                with_keywords: '9663|4458|9951|180547', // horror, supernatural, gore, survival horror keywords
-                sort_by: 'vote_average.desc',
-                'vote_count.gte': 100,
-                page: page,
-                language: 'pt-BR'
-            });
-            
-            promises.push(apiFetch(url));
-        }
+        // Fetch series from each streaming provider in parallel
+        const providerPromises = [
+            fetchSeriesByProvider(STREAMING_PROVIDERS.NETFLIX, 'Netflix', 8),
+            fetchSeriesByProvider(STREAMING_PROVIDERS.DISNEY_PLUS, 'Disney+', 5),
+            fetchSeriesByProvider(STREAMING_PROVIDERS.PARAMOUNT_PLUS, 'Paramount+', 5),
+            fetchSeriesByProvider(STREAMING_PROVIDERS.APPLE_TV, 'Apple TV+', 5),
+            fetchSeriesByProvider(STREAMING_PROVIDERS.PRIME_VIDEO, 'Prime Video', 5),
+            fetchSeriesByProvider(STREAMING_PROVIDERS.HBO_MAX, 'HBO Max', 5)
+        ];
 
-        const results = await Promise.all(promises);
+        const providerResults = await Promise.all(providerPromises);
         
-        // Combine and process results
-        const allSeries = results.flatMap(result => result.results || []);
+        // Combine all series from different providers
+        const allSeries = providerResults.flat();
         
-        console.log(`Fetched ${allSeries.length} series from TMDB`);
+        // Remove duplicates by TMDB ID
+        const uniqueSeries = [];
+        const seenIds = new Set();
+        
+        for (const series of allSeries) {
+            if (!seenIds.has(series.id)) {
+                seenIds.add(series.id);
+                uniqueSeries.push(series);
+            }
+        }
+        
+        console.log(`Fetched ${uniqueSeries.length} unique series from TMDB`);
         
         // Map TMDB data to our format
-        seriesCache = allSeries.map((series, index) => {
+        seriesCache = uniqueSeries.map((series) => {
             const ano = series.first_air_date ? new Date(series.first_air_date).getFullYear() : 'N/A';
             
-            // Simplify streaming info (would need additional endpoints for accurate data)
-            // Using consistent naming with the filter options in HTML
-            let streaming = [];
-            if (series.popularity > 100) streaming.push('Netflix');
-            if (series.vote_average > 7.5) streaming.push('Prime Video'); // Changed from 'Amazon Prime'
-            if (ano >= 2020) streaming.push('HBO Max'); // Changed from 'Max'
-            if (streaming.length === 0) streaming = ['Vários'];
+            // Use the provider information from the fetch
+            let streaming = series.streaming_provider || 'Vários';
 
             return {
                 id: `serie-${series.id}`,
                 titulo: series.name,
                 ano: ano,
-                criador: 'Various', // Would need /tv/{id}/credits endpoint
-                sinopse: series.overview || 'No description available.',
+                criador: 'Various',
+                sinopse: series.overview || 'Sem sinopse disponível.',
                 poster: getTMDBImageUrl(series.poster_path, 'poster'),
                 backdrop: getTMDBImageUrl(series.backdrop_path, 'backdrop'),
                 temporadas: series.number_of_seasons || 'N/A',
-                streaming: streaming.join(', '),
+                streaming: streaming,
                 genero: 'Horror/Mystery',
                 nota: series.vote_average ? parseFloat(series.vote_average.toFixed(1)) : 7.0,
                 votos: series.vote_count,
@@ -80,8 +116,26 @@ async function fetchHorrorSeries() {
             };
         });
 
+        // Add fallback series to ensure we have good content
+        const fallbackSeries = getFallbackSeries();
+        
+        // Merge API series with fallback, avoiding duplicates by title
+        const allSeriesMap = new Map();
+        
+        // Add API series first
+        seriesCache.forEach(s => allSeriesMap.set(s.titulo.toLowerCase(), s));
+        
+        // Add fallback series that aren't already present
+        fallbackSeries.forEach(s => {
+            if (!allSeriesMap.has(s.titulo.toLowerCase())) {
+                allSeriesMap.set(s.titulo.toLowerCase(), s);
+            }
+        });
+        
+        seriesCache = Array.from(allSeriesMap.values());
+
         seriesCacheTimestamp = Date.now();
-        console.log('Series cached successfully');
+        console.log(`Total series after merge: ${seriesCache.length}`);
         return seriesCache;
 
     } catch (error) {
@@ -312,7 +366,188 @@ function getFallbackSeries() {
             poster: 'https://image.tmdb.org/t/p/w500/2rl04pRCaGfz91lwfWdDQmOiGJp.jpg',
             temporadas: 1,
             streaming: 'Netflix',
-            genero: 'Horror, Drama'
+            genero: 'Horror, Drama',
+            nota: 8.1
+        },
+        {
+            id: 'serie21',
+            titulo: 'Wednesday',
+            ano: 2022,
+            criador: 'Alfred Gough, Miles Millar',
+            sinopse: 'Wednesday Addams investiga mistérios sobrenaturais em escola peculiar.',
+            poster: 'https://image.tmdb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg',
+            temporadas: 2,
+            streaming: 'Netflix',
+            genero: 'Horror, Comédia',
+            nota: 8.5
+        },
+        {
+            id: 'serie22',
+            titulo: 'The Watcher',
+            ano: 2022,
+            criador: 'Ryan Murphy, Ian Brennan',
+            sinopse: 'Família recebe cartas ameaçadoras de observador anônimo em nova casa.',
+            poster: 'https://image.tmdb.org/t/p/w500/6RrseODZo2e66XOzC1XMzMuecnf.jpg',
+            temporadas: 1,
+            streaming: 'Netflix',
+            genero: 'Horror, Thriller',
+            nota: 7.3
+        },
+        {
+            id: 'serie23',
+            titulo: 'Midnight Mass',
+            ano: 2021,
+            criador: 'Mike Flanagan',
+            sinopse: 'Comunidade isolada experimenta eventos miraculosos e sinistros.',
+            poster: 'https://image.tmdb.org/t/p/w500/iYoMZYVD775CQRqCcGbD8nZcLqP.jpg',
+            temporadas: 1,
+            streaming: 'Netflix',
+            genero: 'Horror, Drama',
+            nota: 7.7
+        },
+        {
+            id: 'serie24',
+            titulo: 'The Haunting of Bly Manor',
+            ano: 2020,
+            criador: 'Mike Flanagan',
+            sinopse: 'Babá cuida de crianças em mansão inglesa assombrada por fantasmas.',
+            poster: 'https://image.tmdb.org/t/p/w500/vIXQ85eeJtSld9nR6aq58gDdmbI.jpg',
+            temporadas: 1,
+            streaming: 'Netflix',
+            genero: 'Horror, Romance',
+            nota: 7.4
+        },
+        {
+            id: 'serie25',
+            titulo: 'Chucky',
+            ano: 2021,
+            criador: 'Don Mancini',
+            sinopse: 'Boneco assassino Chucky retorna para aterrorizar nova cidade.',
+            poster: 'https://image.tmdb.org/t/p/w500/kY0BogCM8SkNJ0MNiHB3VTM86Tz.jpg',
+            temporadas: 3,
+            streaming: 'Paramount+',
+            genero: 'Horror, Comédia',
+            nota: 7.5
+        },
+        {
+            id: 'serie26',
+            titulo: 'Evil Dead Rise',
+            ano: 2023,
+            criador: 'Lee Cronin',
+            sinopse: 'Irmãs enfrentam demônios em prédio de Los Angeles.',
+            poster: 'https://image.tmdb.org/t/p/w500/5ik4ATKmNtmJU6AYD0bLm56BCVM.jpg',
+            temporadas: 1,
+            streaming: 'HBO Max',
+            genero: 'Horror',
+            nota: 6.8
+        },
+        {
+            id: 'serie27',
+            titulo: 'The Last of Us',
+            ano: 2023,
+            criador: 'Craig Mazin, Neil Druckmann',
+            sinopse: 'Sobrevivente e jovem atravessam América pós-apocalíptica.',
+            poster: 'https://image.tmdb.org/t/p/w500/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg',
+            temporadas: 2,
+            streaming: 'HBO Max',
+            genero: 'Horror, Drama',
+            nota: 8.8
+        },
+        {
+            id: 'serie28',
+            titulo: 'Goosebumps',
+            ano: 2023,
+            criador: 'Rob Letterman, Nicholas Stoller',
+            sinopse: 'Adolescentes liberam criaturas dos livros de R.L. Stine.',
+            poster: 'https://image.tmdb.org/t/p/w500/fPNJBt1r8YqHLjJPGlb0Q5JQNK7.jpg',
+            temporadas: 1,
+            streaming: 'Disney+',
+            genero: 'Horror, Aventura',
+            nota: 7.2
+        },
+        {
+            id: 'serie29',
+            titulo: 'The Changeling',
+            ano: 2023,
+            criador: 'Kelly Marcel',
+            sinopse: 'Pai descobre segredos sombrios sobre esposa e filho.',
+            poster: 'https://image.tmdb.org/t/p/w500/sn24UmYl3FeZ1JVCqxjqvh6Yiyv.jpg',
+            temporadas: 1,
+            streaming: 'Apple TV+',
+            genero: 'Horror, Fantasia',
+            nota: 7.0
+        },
+        {
+            id: 'serie30',
+            titulo: 'Shining Vale',
+            ano: 2022,
+            criador: 'Sharon Horgan, Jeff Astrof',
+            sinopse: 'Família se muda para casa assombrada ou mãe está enlouquecendo?',
+            poster: 'https://image.tmdb.org/t/p/w500/cHgPHYhqNlGsMAHOsIjkZ6ek4yj.jpg',
+            temporadas: 2,
+            streaming: 'Paramount+',
+            genero: 'Horror, Comédia',
+            nota: 6.9
+        },
+        {
+            id: 'serie31',
+            titulo: 'Invasion',
+            ano: 2021,
+            criador: 'Simon Kinberg, David Weil',
+            sinopse: 'Invasão alienígena vista através de múltiplas perspectivas globais.',
+            poster: 'https://image.tmdb.org/t/p/w500/q5PlkescqNqHE41e2ykDPKMpazk.jpg',
+            temporadas: 2,
+            streaming: 'Apple TV+',
+            genero: 'Horror, Sci-Fi',
+            nota: 6.7
+        },
+        {
+            id: 'serie32',
+            titulo: '1899',
+            ano: 2022,
+            criador: 'Baran bo Odar, Jantje Friese',
+            sinopse: 'Imigrantes em navio a vapor encontram mistério em alto-mar.',
+            poster: 'https://image.tmdb.org/t/p/w500/hNdwlXjD2aNyN9C0Hfx5QpuNs7J.jpg',
+            temporadas: 1,
+            streaming: 'Netflix',
+            genero: 'Horror, Mystery',
+            nota: 7.5
+        },
+        {
+            id: 'serie33',
+            titulo: 'Cabinet of Curiosities',
+            ano: 2022,
+            criador: 'Guillermo del Toro',
+            sinopse: 'Antologia de contos macabros selecionados por del Toro.',
+            poster: 'https://image.tmdb.org/t/p/w500/kEoWt9TBzuXfPkW3BLmqMh0pHBY.jpg',
+            temporadas: 1,
+            streaming: 'Netflix',
+            genero: 'Horror',
+            nota: 7.3
+        },
+        {
+            id: 'serie34',
+            titulo: 'The Bastard Son & The Devil Himself',
+            ano: 2022,
+            criador: 'Joe Barton',
+            sinopse: 'Jovem bruxo foge de pai maligno e descobre seus poderes.',
+            poster: 'https://image.tmdb.org/t/p/w500/ifzMBhKZF5pPRPYMymNjSYd57Ej.jpg',
+            temporadas: 1,
+            streaming: 'Netflix',
+            genero: 'Horror, Fantasia',
+            nota: 7.6
+        },
+        {
+            id: 'serie35',
+            titulo: 'Castle Rock',
+            ano: 2018,
+            criador: 'Sam Shaw, Dustin Thomason',
+            sinopse: 'Antologia baseada no universo de Stephen King.',
+            poster: 'https://image.tmdb.org/t/p/w500/6DNXmkJr7WosxIE39Wkbdpb3YVu.jpg',
+            temporadas: 2,
+            streaming: 'HBO Max',
+            genero: 'Horror, Drama',
+            nota: 7.5
         }
     ];
 }

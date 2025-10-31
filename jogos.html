@@ -5,26 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogos de Terror - HallowTales</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        border: 'hsl(var(--border))',
+                        input: 'hsl(var(--input))',
+                        ring: 'hsl(var(--ring))',
+                        background: 'hsl(var(--background))',
+                        foreground: 'hsl(var(--foreground))',
+                        primary: {
+                            DEFAULT: 'hsl(var(--primary))',
+                            foreground: 'hsl(var(--primary-foreground))'
+                        },
+                        secondary: {
+                            DEFAULT: 'hsl(var(--secondary))',
+                            foreground: 'hsl(var(--secondary-foreground))'
+                        },
+                        destructive: {
+                            DEFAULT: 'hsl(var(--destructive))',
+                            foreground: 'hsl(var(--destructive-foreground))'
+                        },
+                        muted: {
+                            DEFAULT: 'hsl(var(--muted))',
+                            foreground: 'hsl(var(--muted-foreground))'
+                        },
+                        accent: {
+                            DEFAULT: 'hsl(var(--accent))',
+                            foreground: 'hsl(var(--accent-foreground))'
+                        },
+                        card: {
+                            DEFAULT: 'hsl(var(--card))',
+                            foreground: 'hsl(var(--card-foreground))'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --background: 0 0% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 0 0% 6%;
+            --card-foreground: 0 0% 98%;
+            --primary: 60 9.1% 97.8%;
+            --primary-foreground: 24 9.8% 10%;
+            --secondary: 12 6.5% 15.1%;
+            --secondary-foreground: 60 9.1% 97.8%;
+            --muted: 12 6.5% 15.1%;
+            --muted-foreground: 24 5.4% 63.9%;
+            --accent: 12 6.5% 15.1%;
+            --accent-foreground: 60 9.1% 97.8%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 60 9.1% 97.8%;
+            --border: 12 6.5% 15.1%;
+            --input: 12 6.5% 15.1%;
+            --ring: 24 5.7% 82.9%;
+            --radius: 0.5rem;
+        }
+    </style>
+    <!-- Vercel Analytics -->
+    <script src="js/analytics.js"></script>
 </head>
-<body>
-    <header>
-        <h1>HallowTales</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">🏠 Início</a></li>
-                <li><a href="livros.html">📚 Livros</a></li>
-                <li><a href="cidades.html">🏛️ Cidades</a></li>
-                <li><a href="filmes.html">🎬 Filmes & Séries</a></li>
-                <li><a href="jogos.html">🎮 Jogos</a></li>
-                <li><a href="quiz.html">❓ Quiz</a></li>
-                <li><a href="favoritos.html">❤️ Favoritos</a></li>
-            </ul>
-        </nav>
+<body class="dark bg-background text-foreground antialiased">
+    <!-- Modern Header with Shadcn-inspired design -->
+    <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-3xl">🎃</span>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-orange-500 via-red-500 to-purple-600 bg-clip-text text-transparent">
+                        HallowTales
+                    </h1>
+                </div>
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="index.html" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                        🏠 Início
+                    </a>
+                    <a href="livros.html" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                        📚 Livros
+                    </a>
+                    <a href="cidades.html" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                        🏛️ Cidades
+                    </a>
+                    <a href="filmes.html" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                        🎬 Filmes & Séries
+                    </a>
+                    <a href="jogos.html" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                        🎮 Jogos
+                    </a>
+                    <a href="quiz.html" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                        ❓ Quiz
+                    </a>
+                    <a href="favoritos.html" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                        ❤️ Favoritos
+                    </a>
+                </nav>
+                <!-- Mobile menu button -->
+                <button id="mobile-menu-btn" class="md:hidden inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" x2="20" y1="12" y2="12"></line>
+                        <line x1="4" x2="20" y1="6" y2="6"></line>
+                        <line x1="4" x2="20" y1="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-border/40">
+            <nav class="container mx-auto px-4 py-2 flex flex-col gap-1">
+                <a href="index.html" class="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md">🏠 Início</a>
+                <a href="livros.html" class="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md">📚 Livros</a>
+                <a href="cidades.html" class="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md">🏛️ Cidades</a>
+                <a href="filmes.html" class="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md">🎬 Filmes & Séries</a>
+                <a href="jogos.html" class="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md">🎮 Jogos</a>
+                <a href="quiz.html" class="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md">❓ Quiz</a>
+                <a href="favoritos.html" class="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md">❤️ Favoritos</a>
+            </nav>
+        </div>
     </header>
-    <main>
-        <section id="jogos">
-            <h2>🎮 Jogos de Terror</h2>
-            <p style="text-align: center; color: #00ffff; font-size: 1.1rem; margin-bottom: 20px;">Os jogos que vão fazer você ter medo de jogar sozinho no escuro</p>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Hero Section -->
+        <div class="relative overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-xl mb-8">
+            <div class="absolute inset-0 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-purple-600/20"></div>
+            <div class="relative p-8 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-500 via-red-500 to-purple-600 bg-clip-text text-transparent mb-4">
+                    🎮 Jogos de Terror
+                </h2>
+                <p class="text-lg text-muted-foreground">
+                    Explore os jogos mais aterrorizantes que vão fazer você perder o sono
+                </p>
+            </div>
+        </div>
+    <section id="jogos" class="mb-8">
             
             <!-- Filtros e busca -->
             <div class="filters-container">
@@ -43,14 +162,34 @@
             </div>
         </section>
     </main>
-    <footer>
-        <div class="footer-decoration">🕷️ 🕸️ 🦇 🎃 🦇 🕸️ 🕷️</div>
-        <p>&copy; 2025 HallowTales. Todos os direitos reservados.</p>
-        <p class="footer-message">👻 Feliz Halloween! Que seus pesadelos sejam aterrorizantes! 👻</p>
+
+    <!-- Footer with Shadcn-inspired design -->
+    <footer class="border-t border-border/40 bg-muted/50 py-8 mt-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center space-y-4">
+                <div class="flex items-center justify-center gap-4 text-2xl">
+                    🕷️ 🕸️ 🦇 🎃 🦇 🕸️ 🕷️
+                </div>
+                <p class="text-sm text-muted-foreground">
+                    &copy; 2025 HallowTales. Todos os direitos reservados.
+                </p>
+                <p class="text-lg font-semibold text-destructive">
+                    👻 Feliz Halloween! Que seus pesadelos sejam aterrorizantes! 👻
+                </p>
+            </div>
+        </div>
     </footer>
+    
     <script src="js/favoritos.js"></script>
     <script src="js/api-config.js"></script>
     <script src="js/api-jogos.js"></script>
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn')?.addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
     <script>
         // Renderiza jogos
         function renderJogos(jogos) {
