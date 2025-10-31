@@ -85,7 +85,8 @@ async function fetchHorrorGames() {
                 poster: game.background_image || 'https://via.placeholder.com/500x750/1a0033/00ff00?text=No+Image',
                 plataformas: game.parent_platforms?.map(p => p.platform.name).join(', ') || 'PC',
                 categoria: categoria,
-                nota: game.rating ? parseFloat(game.rating.toFixed(1)) : (game.metacritic ? game.metacritic / 10 : 7.5),
+                // RAWG rating is 0-5, convert to 0-10 scale
+                nota: game.rating ? parseFloat((game.rating * 2).toFixed(1)) : (game.metacritic ? game.metacritic / 10 : 7.5),
                 metacritic: game.metacritic || null,
                 rawg_id: game.id,
                 rawg_slug: game.slug,
